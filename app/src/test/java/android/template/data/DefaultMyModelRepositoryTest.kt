@@ -38,7 +38,7 @@ class DefaultMyModelRepositoryTest {
 
         repository.add("Repository")
 
-        assertEquals(listOf(MyModel(name = "Repository")), repository.myModels.first())
+        assertEquals(listOf(MyModel(uid = 1, name = "Repository")), repository.myModels.first())
     }
 
 }
@@ -46,10 +46,13 @@ class DefaultMyModelRepositoryTest {
 private class FakeMyModelDao : MyModelDao {
 
     private val data = MutableStateFlow<List<MyModel>>(emptyList())
+    private var nextId = 1
 
     override fun getMyModels(): Flow<List<MyModel>> = data
 
-    override suspend fun insertMyModel(item: MyModel) {
-        data.value = listOf(item) + data.value
+    override suspend fun insertMyModel(item: MyModel): Long {
+        val inserted = item.copy(uid = nextId++)
+        data.value = listOf(inserted) + data.value
+        return inserted.uid.toLong()
     }
 }

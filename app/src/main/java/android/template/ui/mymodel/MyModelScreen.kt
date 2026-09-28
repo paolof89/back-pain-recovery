@@ -105,7 +105,7 @@ internal fun MyModelScreen(
                 }
             }
         }
-        items(items) {
+        items(items, key = { it.uid }) {
             Text("Saved item: ${it.name}")
         }
     }
@@ -130,7 +130,7 @@ private fun PortraitPreview() {
 }
 
 private fun sampleItems() = listOf(
-    MyModel(name = "Compose"),
-    MyModel(name = "Room"),
-    MyModel(name = "Kotlin"),
+    MyModel(uid = 1, name = "Compose"),
+    MyModel(uid = 2, name = "Room"),
+    MyModel(uid = 3, name = "Kotlin"),
 )

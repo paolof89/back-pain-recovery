@@ -41,16 +41,19 @@ interface DataModule {
 
 class FakeMyModelRepository @Inject constructor() : MyModelRepository {
     private val data = MutableStateFlow(fakeMyModels)
+    private var nextId = fakeMyModels.maxOf(MyModel::uid) + 1
 
     override val myModels: Flow<List<MyModel>> = data
 
-    override suspend fun add(name: String) {
-        data.value = listOf(MyModel(name = name)) + data.value
+    override suspend fun add(name: String): MyModel {
+        val item = MyModel(uid = nextId++, name = name)
+        data.value = listOf(item) + data.value
+        return item
     }
 }
 
 val fakeMyModels = listOf(
-    MyModel(name = "One"),
-    MyModel(name = "Two"),
-    MyModel(name = "Three"),
+    MyModel(uid = 1, name = "One"),
+    MyModel(uid = 2, name = "Two"),
+    MyModel(uid = 3, name = "Three"),
 )

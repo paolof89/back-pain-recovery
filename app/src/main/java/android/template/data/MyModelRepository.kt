@@ -24,7 +24,7 @@ import javax.inject.Inject
 interface MyModelRepository {
     val myModels: Flow<List<MyModel>>
 
-    suspend fun add(name: String)
+    suspend fun add(name: String): MyModel
 }
 
 class DefaultMyModelRepository @Inject constructor(
@@ -33,7 +33,9 @@ class DefaultMyModelRepository @Inject constructor(
 
     override val myModels: Flow<List<MyModel>> = myModelDao.getMyModels()
 
-    override suspend fun add(name: String) {
-        myModelDao.insertMyModel(MyModel(name = name))
+    override suspend fun add(name: String): MyModel {
+        val item = MyModel(name = name)
+        val id = myModelDao.insertMyModel(item).toInt()
+        return item.copy(uid = id)
     }
 }

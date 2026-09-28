@@ -25,11 +25,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Entity
 data class MyModel(
-    val name: String
-) {
     @PrimaryKey(autoGenerate = true)
-    var uid: Int = 0
-}
+    val uid: Int = 0,
+    val name: String
+)
 
 @Dao
 interface MyModelDao {
@@ -37,5 +36,5 @@ interface MyModelDao {
     fun getMyModels(): Flow<List<MyModel>>
 
     @Insert
-    suspend fun insertMyModel(item: MyModel)
+    suspend fun insertMyModel(item: MyModel): Long
 }

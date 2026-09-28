@@ -55,7 +55,7 @@ class MyModelViewModelTest {
         viewModel.addMyModel("Compose")
 
         assertEquals(
-            MyModelUiState.Success(listOf(MyModel(name = "Compose"))),
+            MyModelUiState.Success(listOf(MyModel(uid = 1, name = "Compose"))),
             viewModel.uiState.first { it is MyModelUiState.Success }
         )
     }
@@ -73,22 +73,25 @@ class MyModelViewModelTest {
 private class LoadingMyModelRepository : MyModelRepository {
     override val myModels: Flow<List<MyModel>> = emptyFlow()
 
-    override suspend fun add(name: String) = Unit
+    override suspend fun add(name: String) = MyModel(name = name)
 }
 
 private class FakeMyModelRepository : MyModelRepository {
 
     private val data = MutableStateFlow<List<MyModel>>(emptyList())
+    private var nextId = 1
 
     override val myModels: Flow<List<MyModel>> = data
 
-    override suspend fun add(name: String) {
-        data.value = listOf(MyModel(name = name)) + data.value
+    override suspend fun add(name: String): MyModel {
+        val item = MyModel(uid = nextId++, name = name)
+        data.value = listOf(item) + data.value
+        return item
     }
 }
 
 private class FailingMyModelRepository : MyModelRepository {
     override val myModels: Flow<List<MyModel>> = flow { throw IllegalStateException("Boom") }
 
-    override suspend fun add(name: String) = Unit
+    override suspend fun add(name: String) = MyModel(name = name)
 }
