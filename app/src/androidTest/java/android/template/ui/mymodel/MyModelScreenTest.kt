@@ -48,6 +48,27 @@ class MyModelScreenTest {
             .onNodeWithText("Saved item: ${FAKE_DATA.first().name}")
             .assertExists()
     }
+
+    @Test
+    fun loadingState_isDisplayed() {
+        composeTestRule.setContent {
+            MyModelScreen(uiState = MyModelUiState.Loading, onSave = {})
+        }
+
+        composeTestRule.onNodeWithText("Loading...").assertExists()
+    }
+
+    @Test
+    fun errorState_isDisplayed() {
+        composeTestRule.setContent {
+            MyModelScreen(
+                uiState = MyModelUiState.Error(IllegalStateException("Boom")),
+                onSave = {},
+            )
+        }
+
+        composeTestRule.onNodeWithText("Boom").assertExists()
+    }
 }
 
 private val FAKE_DATA = listOf(

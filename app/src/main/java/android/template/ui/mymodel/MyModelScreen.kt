@@ -43,11 +43,24 @@ fun MyModelScreen(
     modifier: Modifier = Modifier,
     viewModel: MyModelViewModel = hiltViewModel(),
 ) {
-    val items by viewModel.uiState.collectAsStateWithLifecycle()
-    when (val state = items) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    MyModelScreen(
+        uiState = uiState,
+        onSave = viewModel::addMyModel,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun MyModelScreen(
+    uiState: MyModelUiState,
+    onSave: (name: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (val state = uiState) {
         is MyModelUiState.Success -> MyModelScreen(
             items = state.data,
-            onSave = viewModel::addMyModel,
+            onSave = onSave,
             modifier = modifier,
         )
 

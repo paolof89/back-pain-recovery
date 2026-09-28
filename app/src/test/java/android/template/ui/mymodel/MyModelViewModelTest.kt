@@ -24,9 +24,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -57,6 +59,15 @@ class MyModelViewModelTest {
             viewModel.uiState.first { it is MyModelUiState.Success }
         )
     }
+
+    @Test
+    fun uiState_onRepositoryFailure_isError() = runTest {
+        val viewModel = MyModelViewModel(FailingMyModelRepository())
+        val state = viewModel.uiState.first { it is MyModelUiState.Error }
+
+        assertTrue(state is MyModelUiState.Error)
+        assertEquals("Boom", (state as MyModelUiState.Error).throwable.message)
+    }
 }
 
 private class LoadingMyModelRepository : MyModelRepository {
@@ -74,4 +85,10 @@ private class FakeMyModelRepository : MyModelRepository {
     override suspend fun add(name: String) {
         data.value = listOf(MyModel(name = name)) + data.value
     }
+}
+
+private class FailingMyModelRepository : MyModelRepository {
+    override val myModels: Flow<List<MyModel>> = flow { throw IllegalStateException("Boom") }
+
+    override suspend fun add(name: String) = Unit
 }
