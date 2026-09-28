@@ -54,9 +54,11 @@ class MyModelViewModelTest {
 
         viewModel.addMyModel("Compose")
 
+        val expectedState = MyModelUiState.Success(listOf(MyModel(uid = 1, name = "Compose")))
+
         assertEquals(
-            MyModelUiState.Success(listOf(MyModel(uid = 1, name = "Compose"))),
-            viewModel.uiState.first { it is MyModelUiState.Success }
+            expectedState,
+            viewModel.uiState.first { it == expectedState }
         )
     }
 
@@ -65,6 +67,17 @@ class MyModelViewModelTest {
         val viewModel = MyModelViewModel(FailingMyModelRepository())
         val state = viewModel.uiState.first { it is MyModelUiState.Error }
 
+        assertTrue(state is MyModelUiState.Error)
+        assertEquals("Boom", (state as MyModelUiState.Error).throwable.message)
+    }
+
+    @Test
+    fun uiState_onSaveFailure_isError() = runTest {
+        val viewModel = MyModelViewModel(FailingAddMyModelRepository())
+
+        viewModel.addMyModel("Compose")
+
+        val state = viewModel.uiState.first { it is MyModelUiState.Error }
         assertTrue(state is MyModelUiState.Error)
         assertEquals("Boom", (state as MyModelUiState.Error).throwable.message)
     }
@@ -94,4 +107,12 @@ private class FailingMyModelRepository : MyModelRepository {
     override val myModels: Flow<List<MyModel>> = flow { throw IllegalStateException("Boom") }
 
     override suspend fun add(name: String) = MyModel(name = name)
+}
+
+private class FailingAddMyModelRepository : MyModelRepository {
+    override val myModels: Flow<List<MyModel>> = MutableStateFlow(emptyList())
+
+    override suspend fun add(name: String): MyModel {
+        throw IllegalStateException("Boom")
+    }
 }

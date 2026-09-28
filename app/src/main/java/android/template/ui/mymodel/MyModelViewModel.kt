@@ -18,34 +18,48 @@ package android.template.ui.mymodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import android.template.data.MyModelRepository
 import android.template.data.local.database.MyModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import android.template.ui.mymodel.MyModelUiState.Error
 import android.template.ui.mymodel.MyModelUiState.Loading
 import android.template.ui.mymodel.MyModelUiState.Success
-import javax.inject.Inject
 
 @HiltViewModel
 class MyModelViewModel @Inject constructor(
     private val myModelRepository: MyModelRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<MyModelUiState> = myModelRepository
-        .myModels
-        .map(::Success)
-        .catch { emit(Error(it)) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
+    private val _uiState = MutableStateFlow<MyModelUiState>(Loading)
+    val uiState: StateFlow<MyModelUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            myModelRepository.myModels
+                .map(::Success)
+                .catch { emit(Error(it)) }
+                .collect { _uiState.value = it }
+        }
+    }
 
     fun addMyModel(name: String) {
+        val trimmedName = name.trim()
+        if (trimmedName.isEmpty()) return
+
         viewModelScope.launch {
-            myModelRepository.add(name)
+            try {
+                myModelRepository.add(trimmedName)
+            } catch (throwable: Throwable) {
+                _uiState.value = Error(throwable)
+            }
         }
     }
 }

@@ -99,7 +99,8 @@ internal fun MyModelScreen(
 
                 Button(
                     modifier = Modifier.width(96.dp),
-                    onClick = { onSave(nameMyModel) }
+                    enabled = nameMyModel.isNotBlank(),
+                    onClick = { onSave(nameMyModel.trim()) }
                 ) {
                     Text("Save")
                 }
