@@ -37,7 +37,6 @@ fun MainNavigation() {
         entryProvider = entryProvider {
             entry<Main> {
                 MyModelScreen(
-                    onItemClick = { navKey -> backStack.add(navKey) },
                     modifier = Modifier.safeDrawingPadding().padding(16.dp)
                 )
             }

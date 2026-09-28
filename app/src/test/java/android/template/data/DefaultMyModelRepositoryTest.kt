@@ -19,7 +19,7 @@ package android.template.data
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -45,13 +45,11 @@ class DefaultMyModelRepositoryTest {
 
 private class FakeMyModelDao : MyModelDao {
 
-    private val data = mutableListOf<MyModel>()
+    private val data = MutableStateFlow<List<MyModel>>(emptyList())
 
-    override fun getMyModels(): Flow<List<MyModel>> = flow {
-        emit(data)
-    }
+    override fun getMyModels(): Flow<List<MyModel>> = data
 
     override suspend fun insertMyModel(item: MyModel) {
-        data.add(0, item)
+        data.value = listOf(item) + data.value
     }
 }
