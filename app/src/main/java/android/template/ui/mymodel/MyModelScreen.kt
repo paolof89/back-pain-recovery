@@ -17,13 +17,14 @@
 package android.template.ui.mymodel
 
 import android.template.data.local.database.MyModel
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import android.template.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.weight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -78,28 +79,33 @@ internal fun MyModelScreen(
     onSave: (name: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier) {
-        var nameMyModel by remember { mutableStateOf("Compose") }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = nameMyModel,
-                onValueChange = { nameMyModel = it }
-            )
+    var nameMyModel by remember { mutableStateOf("Compose") }
 
-            Button(
-                modifier = Modifier.width(96.dp),
-                onClick = { onSave(nameMyModel) }
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text("Save")
+                TextField(
+                    modifier = Modifier.weight(1f),
+                    value = nameMyModel,
+                    onValueChange = { nameMyModel = it },
+                    label = { Text("Item name") },
+                )
+
+                Button(
+                    modifier = Modifier.width(96.dp),
+                    onClick = { onSave(nameMyModel) }
+                ) {
+                    Text("Save")
+                }
             }
         }
-        items.forEach {
+        items(items) {
             Text("Saved item: ${it.name}")
         }
     }

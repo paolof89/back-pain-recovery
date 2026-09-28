@@ -18,8 +18,12 @@ package android.template.ui.mymodel
 
 import android.template.data.local.database.MyModel
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onNode
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextReplacement
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Before
 import org.junit.Rule
@@ -68,6 +72,22 @@ class MyModelScreenTest {
         }
 
         composeTestRule.onNodeWithText("Boom").assertExists()
+    }
+
+    @Test
+    fun saveButton_usesCurrentInputValue() {
+        var savedName = ""
+
+        composeTestRule.setContent {
+            MyModelScreen(emptyList(), onSave = { savedName = it })
+        }
+
+        composeTestRule.onNode(hasSetTextAction()).performTextReplacement("Room")
+        composeTestRule.onNodeWithText("Save").performClick()
+
+        composeTestRule.runOnIdle {
+            org.junit.Assert.assertEquals("Room", savedName)
+        }
     }
 }
 

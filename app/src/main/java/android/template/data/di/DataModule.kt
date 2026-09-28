@@ -22,7 +22,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import android.template.data.DefaultMyModelRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import android.template.data.MyModelRepository
 import android.template.data.local.database.MyModel
 import javax.inject.Inject
@@ -40,10 +40,12 @@ interface DataModule {
 }
 
 class FakeMyModelRepository @Inject constructor() : MyModelRepository {
-    override val myModels: Flow<List<MyModel>> = flowOf(fakeMyModels)
+    private val data = MutableStateFlow(fakeMyModels)
+
+    override val myModels: Flow<List<MyModel>> = data
 
     override suspend fun add(name: String) {
-        throw NotImplementedError()
+        data.value = listOf(MyModel(name = name)) + data.value
     }
 }
 

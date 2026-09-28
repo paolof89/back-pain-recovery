@@ -20,6 +20,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import android.template.data.di.fakeMyModels
@@ -33,8 +34,13 @@ class NavigationTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Before
+    fun setup() {
+        hiltRule.inject()
+    }
+
     @Test
-    fun test1() {
+    fun startDestination_displaysSeededItems() {
         // TODO: Add navigation tests
         composeTestRule.onNodeWithText(fakeMyModels.first().name, substring = true).assertExists()
     }
