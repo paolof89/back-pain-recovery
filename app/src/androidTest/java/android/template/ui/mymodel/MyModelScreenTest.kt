@@ -16,6 +16,7 @@
 
 package android.template.ui.mymodel
 
+import android.template.data.local.database.MyModel
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -48,4 +49,8 @@ class MyModelScreenTest {
     }
 }
 
-private val FAKE_DATA = listOf("Compose", "Room", "Kotlin")
+private val FAKE_DATA = listOf(
+    MyModel(name = "Compose"),
+    MyModel(name = "Room"),
+    MyModel(name = "Kotlin"),
+)

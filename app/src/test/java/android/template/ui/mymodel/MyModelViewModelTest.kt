@@ -17,14 +17,18 @@
 package android.template.ui.mymodel
 
 
+import android.template.MainDispatcherRule
+import android.template.data.MyModelRepository
+import android.template.data.local.database.MyModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
-import android.template.data.MyModelRepository
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -33,27 +37,41 @@ import android.template.data.MyModelRepository
  */
 @OptIn(ExperimentalCoroutinesApi::class) // TODO: Remove when stable
 class MyModelViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
+
     @Test
     fun uiState_initiallyLoading() = runTest {
-        val viewModel = MyModelViewModel(FakeMyModelRepository())
+        val viewModel = MyModelViewModel(LoadingMyModelRepository())
         assertEquals(viewModel.uiState.first(), MyModelUiState.Loading)
     }
 
     @Test
     fun uiState_onItemSaved_isDisplayed() = runTest {
         val viewModel = MyModelViewModel(FakeMyModelRepository())
-        assertEquals(viewModel.uiState.first(), MyModelUiState.Loading)
+
+        viewModel.addMyModel("Compose")
+
+        assertEquals(
+            MyModelUiState.Success(listOf(MyModel(name = "Compose"))),
+            viewModel.uiState.first { it is MyModelUiState.Success }
+        )
     }
+}
+
+private class LoadingMyModelRepository : MyModelRepository {
+    override val myModels: Flow<List<MyModel>> = emptyFlow()
+
+    override suspend fun add(name: String) = Unit
 }
 
 private class FakeMyModelRepository : MyModelRepository {
 
-    private val data = mutableListOf<String>()
+    private val data = MutableStateFlow<List<MyModel>>(emptyList())
 
-    override val myModels: Flow<List<String>>
-        get() = flow { emit(data.toList()) }
+    override val myModels: Flow<List<MyModel>> = data
 
     override suspend fun add(name: String) {
-        data.add(0, name)
+        data.value = listOf(MyModel(name = name)) + data.value
     }
 }

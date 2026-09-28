@@ -16,6 +16,7 @@
 
 package android.template.ui.mymodel
 
+import android.template.data.local.database.MyModel
 import android.template.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,10 +46,16 @@ fun MyModelScreen(
     viewModel: MyModelViewModel = hiltViewModel(),
 ) {
     val items by viewModel.uiState.collectAsStateWithLifecycle()
-    if (items is MyModelUiState.Success) {
-        MyModelScreen(
-            items = (items as MyModelUiState.Success).data,
+    when (val state = items) {
+        is MyModelUiState.Success -> MyModelScreen(
+            items = state.data,
             onSave = viewModel::addMyModel,
+            modifier = modifier,
+        )
+
+        MyModelUiState.Loading -> Text("Loading...", modifier = modifier)
+        is MyModelUiState.Error -> Text(
+            text = state.throwable.message ?: "Unable to load saved items.",
             modifier = modifier,
         )
     }
@@ -56,7 +63,7 @@ fun MyModelScreen(
 
 @Composable
 internal fun MyModelScreen(
-    items: List<String>,
+    items: List<MyModel>,
     onSave: (name: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -82,7 +89,7 @@ internal fun MyModelScreen(
             }
         }
         items.forEach {
-            Text("Saved item: $it")
+            Text("Saved item: ${it.name}")
         }
     }
 }
@@ -93,7 +100,7 @@ internal fun MyModelScreen(
 @Composable
 private fun DefaultPreview() {
     MyApplicationTheme {
-        MyModelScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
+        MyModelScreen(sampleItems(), onSave = {})
     }
 }
 
@@ -101,6 +108,12 @@ private fun DefaultPreview() {
 @Composable
 private fun PortraitPreview() {
     MyApplicationTheme {
-        MyModelScreen(listOf("Compose", "Room", "Kotlin"), onSave = {})
+        MyModelScreen(sampleItems(), onSave = {})
     }
 }
+
+private fun sampleItems() = listOf(
+    MyModel(name = "Compose"),
+    MyModel(name = "Room"),
+    MyModel(name = "Kotlin"),
+)

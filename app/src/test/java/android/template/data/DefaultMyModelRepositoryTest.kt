@@ -38,7 +38,7 @@ class DefaultMyModelRepositoryTest {
 
         repository.add("Repository")
 
-        assertEquals(repository.myModels.first().size, 1)
+        assertEquals(listOf(MyModel(name = "Repository")), repository.myModels.first())
     }
 
 }

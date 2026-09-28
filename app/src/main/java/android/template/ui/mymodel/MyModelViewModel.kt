@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import android.template.data.MyModelRepository
+import android.template.data.local.database.MyModel
 import android.template.ui.mymodel.MyModelUiState.Error
 import android.template.ui.mymodel.MyModelUiState.Loading
 import android.template.ui.mymodel.MyModelUiState.Success
@@ -37,7 +38,8 @@ class MyModelViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<MyModelUiState> = myModelRepository
-        .myModels.map<List<String>, MyModelUiState>(::Success)
+        .myModels
+        .map(::Success)
         .catch { emit(Error(it)) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Loading)
 
@@ -51,5 +53,5 @@ class MyModelViewModel @Inject constructor(
 sealed interface MyModelUiState {
     object Loading : MyModelUiState
     data class Error(val throwable: Throwable) : MyModelUiState
-    data class Success(val data: List<String>) : MyModelUiState
+    data class Success(val data: List<MyModel>) : MyModelUiState
 }
