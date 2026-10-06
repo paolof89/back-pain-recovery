@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "exercises": [
+    { "id": "cat_camel", "name": "Cat-camel", "goal": "Mobilità", "kind": "MOBILITY", "perSide": false, "cues": ["A quattro zampe", "Movimento lento e senza forzare", "Respira in modo fluido"] },
+    { "id": "dead_bug", "name": "Dead bug", "goal": "Controllo lombo-pelvico", "kind": "REPS", "perSide": true, "cues": ["Lombare appoggiata a terra", "Braccio e gamba opposti", "Espira mentre estendi"] },
+    { "id": "bird_dog", "name": "Bird dog", "goal": "Paravertebrali e stabilità", "kind": "HOLD", "perSide": true, "cues": ["Schiena neutra, bacino fermo", "Allunga, non sollevare", "Tieni senza ruotare"] },
+    { "id": "curl_up_mod", "name": "Curl-up modificato", "goal": "Core", "kind": "HOLD", "perSide": false, "cues": ["Una gamba piegata, mani sotto la lombare", "Solleva appena testa e spalle", "Niente flessione della lombare"] },
+    { "id": "side_plank_knees", "name": "Side plank sulle ginocchia", "goal": "Core laterale", "kind": "HOLD", "perSide": true, "cues": ["Gomito sotto la spalla", "Anca in linea", "Respira"] },
+    { "id": "side_plank_full", "name": "Side plank completo", "goal": "Core laterale", "kind": "HOLD", "perSide": true, "cues": ["Piedi sovrapposti o sfalsati", "Corpo in linea", "Non far cadere l'anca"] },
+    { "id": "glute_bridge", "name": "Glute bridge", "goal": "Glutei", "kind": "REPS", "perSide": false, "cues": ["Spingi con i talloni", "Stringi i glutei in alto", "Niente iperestensione della lombare"] },
+    { "id": "sl_glute_bridge", "name": "Glute bridge monopodalico", "goal": "Glutei", "kind": "REPS", "perSide": true, "cues": ["Bacino orizzontale", "Spinta dal tallone", "Salita controllata"] },
+    { "id": "clamshell", "name": "Clamshell con elastico", "goal": "Gluteo medio", "kind": "REPS", "perSide": true, "cues": ["Piedi uniti", "Il bacino non ruota indietro", "Lento in discesa"] },
+    { "id": "hinge_dowel", "name": "Hip hinge con bastone", "goal": "Pattern della catena posteriore", "kind": "REPS", "perSide": false, "cues": ["Bastone a contatto con testa, dorso e sacro", "Spingi indietro le anche", "Ginocchia morbide"] },
+    { "id": "hip_flexor_stretch", "name": "Stretching dei flessori dell'anca", "goal": "Mobilità", "kind": "HOLD", "perSide": true, "cues": ["Posizione di affondo", "Bacino in retroversione leggera", "Non inarcare la schiena"] },
+    { "id": "pallof_press", "name": "Pallof press", "goal": "Anti-rotazione", "kind": "REPS", "perSide": true, "cues": ["Elastico laterale", "Spingi le mani avanti", "Il tronco non ruota"] },
+    { "id": "suitcase_carry", "name": "Suitcase carry", "goal": "Stabilità del tronco", "kind": "DISTANCE", "perSide": true, "cues": ["Carico leggero in una mano", "Spalle livellate", "Passo normale"] },
+    { "id": "rdl_light", "name": "RDL con carico leggero", "goal": "Catena posteriore", "kind": "REPS", "perSide": false, "cues": ["Carico ben sotto il massimale", "Schiena neutra", "Movimento dalle anche"] },
+    { "id": "goblet_box_squat", "name": "Goblet squat su box", "goal": "Arti inferiori senza carico assiale", "kind": "REPS", "perSide": false, "cues": ["Peso al petto", "Siediti sul box controllando", "Ginocchia in linea coi piedi"] },
+    { "id": "step_up", "name": "Step-up", "goal": "Glutei e controllo", "kind": "REPS", "perSide": true, "cues": ["Spinta dalla gamba sopra", "Ginocchio stabile", "Discesa lenta"] }
+  ],
+  "phases": [
+    {
+      "id": 1,
+      "name": "Controllo e stabilizzazione",
+      "minWeeks": 4,
+      "sessions": {
+        "STRENGTH_A": [
+          { "exerciseId": "cat_camel", "sets": 1, "reps": 10, "restSec": 0 },
+          { "exerciseId": "dead_bug", "sets": 3, "reps": 8, "restSec": 45 },
+          { "exerciseId": "bird_dog", "sets": 3, "reps": 6, "holdSec": 8, "restSec": 45 },
+          { "exerciseId": "curl_up_mod", "sets": 3, "reps": 6, "holdSec": 8, "restSec": 45 },
+          { "exerciseId": "side_plank_knees", "sets": 3, "holdSec": 20, "restSec": 45 },
+          { "exerciseId": "glute_bridge", "sets": 3, "reps": 12, "restSec": 45 },
+          { "exerciseId": "clamshell", "sets": 3, "reps": 12, "restSec": 30 },
+          { "exerciseId": "hinge_dowel", "sets": 3, "reps": 10, "restSec": 30 },
+          { "exerciseId": "hip_flexor_stretch", "sets": 2, "holdSec": 30, "restSec": 0 }
+        ],
+        "STRENGTH_B": [
+          { "exerciseId": "cat_camel", "sets": 1, "reps": 10, "restSec": 0 },
+          { "exerciseId": "hinge_dowel", "sets": 3, "reps": 10, "restSec": 30 },
+          { "exerciseId": "glute_bridge", "sets": 3, "reps": 12, "restSec": 45 },
+          { "exerciseId": "bird_dog", "sets": 3, "reps": 6, "holdSec": 8, "restSec": 45 },
+          { "exerciseId": "clamshell", "sets": 3, "reps": 12, "restSec": 30 },
+          { "exerciseId": "side_plank_knees", "sets": 3, "holdSec": 20, "restSec": 45 },
+          { "exerciseId": "dead_bug", "sets": 3, "reps": 8, "restSec": 45 },
+          { "exerciseId": "curl_up_mod", "sets": 3, "reps": 6, "holdSec": 8, "restSec": 45 },
+          { "exerciseId": "hip_flexor_stretch", "sets": 2, "holdSec": 30, "restSec": 0 }
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "name": "Rinforzo progressivo",
+      "minWeeks": 4,
+      "sessions": {
+        "STRENGTH_A": [
+          { "exerciseId": "cat_camel", "sets": 1, "reps": 10, "restSec": 0 },
+          { "exerciseId": "bird_dog", "sets": 3, "reps": 8, "holdSec": 10, "restSec": 45 },
+          { "exerciseId": "side_plank_full", "sets": 3, "holdSec": 25, "restSec": 45 },
+          { "exerciseId": "sl_glute_bridge", "sets": 3, "reps": 10, "restSec": 45 },
+          { "exerciseId": "pallof_press", "sets": 3, "reps": 10, "restSec": 45 },
+          { "exerciseId": "goblet_box_squat", "sets": 3, "reps": 10, "restSec": 60 },
+          { "exerciseId": "hip_flexor_stretch", "sets": 2, "holdSec": 30, "restSec": 0 }
+        ],
+        "STRENGTH_B": [
+          { "exerciseId": "cat_camel", "sets": 1, "reps": 10, "restSec": 0 },
+          { "exerciseId": "rdl_light", "sets": 3, "reps": 10, "restSec": 60 },
+          { "exerciseId": "step_up", "sets": 3, "reps": 8, "restSec": 45 },
+          { "exerciseId": "suitcase_carry", "sets": 4, "distanceM": 20, "restSec": 45 },
+          { "exerciseId": "dead_bug", "sets": 3, "reps": 10, "restSec": 45 },
+          { "exerciseId": "side_plank_full", "sets": 3, "holdSec": 25, "restSec": 45 },
+          { "exerciseId": "hip_flexor_stretch", "sets": 2, "holdSec": 30, "restSec": 0 }
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "name": "Ritorno allo sport",
+      "minWeeks": 4,
+      "inheritSessionsFromPhase": 2,
+      "returnToSport": {
+        "running": [
+          { "step": 1, "protocol": "1' corsa + 2' cammino × 8, terreno morbido" },
+          { "step": 2, "protocol": "2' corsa + 1' cammino × 8" },
+          { "step": 3, "protocol": "4' corsa + 1' cammino × 5" },
+          { "step": 4, "protocol": "20' corsa continua facile" }
+        ],
+        "beachVolley": [
+          { "step": 1, "protocol": "Solo palleggi e tecnica, 30'" },
+          { "step": 2, "protocol": "Partite brevi, salti limitati" },
+          { "step": 3, "protocol": "Partita completa secondo tolleranza" }
+        ],
+        "hiking": [
+          { "step": 1, "protocol": "Sentiero facile, zaino leggero, bastoncini in discesa" }
+        ],
+        "rule": "Avanza di uno step solo se l'ultima uscita è 🟢 a 24h"
+      }
+    }
+  ],
+  "minimalSession": [
+    { "exerciseId": "bird_dog", "sets": 2, "reps": 6, "holdSec": 8, "restSec": 20 },
+    { "exerciseId": "dead_bug", "sets": 2, "reps": 8, "restSec": 20 },
+    { "exerciseId": "glute_bridge", "sets": 2, "reps": 12, "restSec": 20 }
+  ],
+  "weekTemplate": [
+    { "day": "MONDAY", "sessionType": "STRENGTH_A", "reminderTime": "07:30" },
+    { "day": "TUESDAY", "sessionType": "AEROBIC", "reminderTime": "19:00" },
+    { "day": "WEDNESDAY", "sessionType": "PILATES", "reminderTime": "18:30" },
+    { "day": "THURSDAY", "sessionType": "STRENGTH_B", "reminderTime": "07:30" },
+    { "day": "FRIDAY", "sessionType": "AEROBIC", "reminderTime": "19:00" },
+    { "day": "SATURDAY", "sessionType": "PILATES", "reminderTime": "10:00" },
+    { "day": "SUNDAY", "sessionType": "ACTIVE_REST", "reminderTime": "11:00" }
+  ],
+  "defaults": {
+    "weeklyTarget": 4,
+    "painCheckTime": "09:00",
+    "officeBreak": { "days": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], "start": "09:00", "end": "18:30", "intervalMin": 75 },
+    "officeBreakRoutine": ["Alzati e cammina 30\"", "5 estensioni in piedi senza forzare", "5 cat-camel in piedi", "Stretching del flessore dell'anca 20\" per lato"]
+  }
+}
