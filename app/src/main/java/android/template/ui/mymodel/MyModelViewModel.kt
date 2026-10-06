@@ -44,7 +44,7 @@ class MyModelViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             myModelRepository.myModels
-                .map<List<String>, MyModelUiState> { Success(it) }
+                .map<List<MyModel>, MyModelUiState> { Success(it) }
                 .catch { emit(Error(it)) }
                 .collect { _uiState.value = it }
         }
