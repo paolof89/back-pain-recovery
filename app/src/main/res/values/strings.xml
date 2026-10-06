@@ -15,5 +15,31 @@
   -->
 
 <resources>
-    <string name="app_name">MyApplication</string>
+  <string name="app_name">Schiena</string>
+  <string name="weekly_plan_title">Piano settimanale</string>
+  <string name="plan_loading">Caricamento del piano...</string>
+  <string name="plan_load_error">Impossibile caricare il programma completo. Riprova o ripristina i valori predefiniti.</string>
+  <string name="retry">Riprova</string>
+  <string name="current_phase">Fase %1$d: %2$s</string>
+  <string name="reminder_time">Promemoria alle %1$s</string>
+  <string name="restore_defaults">Ripristina default</string>
+  <string name="restore_defaults_confirmation">Ripristinare il programma iniziale? Piano settimanale e parametri degli esercizi torneranno ai valori predefiniti. La fase corrente e lo storico delle sessioni saranno conservati.</string>
+  <string name="restore_confirm">Ripristina</string>
+  <string name="cancel">Annulla</string>
+  <string name="plan_restoring">Ripristino del programma...</string>
+  <string name="plan_restore_error">Ripristino non riuscito. Riprova.</string>
+  <string name="retry_restore">Riprova il ripristino</string>
+  <string name="session_strength_a">Forza A</string>
+  <string name="session_strength_b">Forza B</string>
+  <string name="session_aerobic">Aerobico</string>
+  <string name="session_pilates">Pilates</string>
+  <string name="session_free">Libero</string>
+  <string name="session_active_rest">Riposo attivo</string>
+  <string name="day_monday">Lunedì</string>
+  <string name="day_tuesday">Martedì</string>
+  <string name="day_wednesday">Mercoledì</string>
+  <string name="day_thursday">Giovedì</string>
+  <string name="day_friday">Venerdì</string>
+  <string name="day_saturday">Sabato</string>
+  <string name="day_sunday">Domenica</string>
 </resources>

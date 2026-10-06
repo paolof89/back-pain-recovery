@@ -23,17 +23,17 @@ plugins {
 }
 
 android {
-    namespace = "android.template"
+    namespace = "it.finardi.schiena"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "android.template"
-        minSdk = 23
+        applicationId = "it.finardi.schiena"
+        minSdk = 26
         targetSdk = 36
         versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "android.template.HiltTestRunner"
+        testInstrumentationRunner = "it.finardi.schiena.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -62,6 +62,10 @@ android {
         shaders = false
     }
 
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -74,6 +78,13 @@ ksp {
 }
 
 dependencies {
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.compose.material.icons.core)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.turbine)
 
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
