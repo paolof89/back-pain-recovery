@@ -2,7 +2,6 @@ package it.finardi.schiena.ui.session
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
