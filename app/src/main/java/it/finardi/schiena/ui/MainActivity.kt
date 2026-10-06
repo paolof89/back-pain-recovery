@@ -6,7 +6,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
-import it.finardi.schiena.ui.plan.WeeklyPlanRoute
 import it.finardi.schiena.ui.theme.SchienaTheme
 
 @AndroidEntryPoint
@@ -21,7 +20,7 @@ class MainActivity : ComponentActivity() {
         )
         setContent {
             SchienaTheme {
-                WeeklyPlanRoute()
+                SchienaApp()
             }
         }
     }

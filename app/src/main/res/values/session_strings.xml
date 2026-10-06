@@ -1,0 +1,25 @@
+<resources>
+    <string name="log_title">Registra sessione</string>
+    <string name="log_back">Indietro</string>
+    <string name="log_done">Fatta</string>
+    <string name="log_minimal">Minima</string>
+    <string name="log_skipped">Saltata</string>
+    <string name="log_pain">Dolore durante: %1$d / 10</string>
+    <string name="log_radiating">Dolore irradiato alla gamba</string>
+    <string name="log_red_warning">Dolore elevato o irradiato: consulta le indicazioni di sicurezza.</string>
+    <string name="log_duration">Durata in minuti</string>
+    <string name="log_duration_range">Da 1 a 1440 minuti</string>
+    <string name="log_note">Note (facoltative)</string>
+    <string name="log_save">Salva</string>
+    <string name="log_saving">Salvataggio...</string>
+    <string name="log_save_error">Salvataggio non riuscito. Riprova.</string>
+    <string name="log_replace">Esiste un log per questa sessione di oggi: il salvataggio lo aggiorna.</string>
+    <string name="log_start_minimal">Inizia versione minima (5 min)</string>
+    <string name="session_load_error">Impossibile caricare gli esercizi. Riprova.</string>
+    <string name="red_flags_title">Segnali di allarme</string>
+    <string name="red_flags_medical">Contatta il medico se compaiono: dolore alla gamba nuovo o in peggioramento, formicolii o intorpidimento persistenti, perdita di forza (es. piede che &quot;cade&quot;), febbre associata al mal di schiena.</string>
+    <string name="red_flags_emergency_title">Vai subito in pronto soccorso</string>
+    <string name="red_flags_emergency">In caso di alterazioni del controllo di vescica o intestino, o di intorpidimento nella zona genitale/perineale.</string>
+    <string name="red_flags_disclaimer">Questa app segue un programma. Non sostituisce medico o fisiatra.</string>
+    <string name="red_flags_return">Torna</string>
+</resources>

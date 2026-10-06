@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Sprint 2 - 2026-10-06
+
+- Open on Today with the daily database-backed session, ISO-week progress, phase week, office-break totals, dated work-off toggle and pending-check count.
+- Keep the weekly plan accessible and add Navigation 3 routes with saveable navigation keys and an acknowledged save result.
+- Add enabled normal/minimal prescription loading, preserving seed and database parameters without changing the Room schema.
+- Add an exercise player with automatic repeated holds, side/set progression, recovery timers, manual repetition/distance steps, previous/next/skip and pause/resume.
+- Keep the screen awake only during the foreground player; signal timer completion with sound/vibration and pause on background or recreation.
+- Provide minimal-session entry points from Today and log; non-strength DONE logs require duration.
+- Add quick DONE/MINIMAL/SKIPPED logs, pain slider, radiating toggle, notes, validation, retry and duplicate-save protection.
+- Freeze session date/type/phase for playback and saving; restore context through SavedStateHandle.
+- Save same-date/type logs transactionally as updates, removing obsolete pain checks; count distinct completed days toward the weekly goal, including MINIMAL but not SKIPPED.
+- Add pure provisional/verified traffic-light functions and recent history with textual, color-coded status. Low-pain sessions show a provisional green pending verification.
+- Immediately show dedicated neutral safety information on radiating pain; preserve the log draft when returning. Safety information is also reachable from Today/history.
+- Add unit tests for traffic-light combinations, weekly counting, Room session persistence, player stages/timers and Home/session state; add Compose form and real navigation-key restoration tests.
+- Compile the instrumented test APK in CI and upload it as a workflow artifact, without introducing an emulator.
+
+### Sprint 2 Verification
+
+- Editor diagnostics reported no errors in reviewed changes; XML/resource-reference validation and git diff whitespace checks passed without invoking Gradle locally.
+- No Kotlin compilation, lint, unit tests or instrumented tests have been run locally. CI must confirm unit tests, lint, app build and instrumented-test compilation.
+- Compose instrumented tests are not executed by the current CI workflow. Physical-device playback, timer signals, rotation, form restoration and accessibility remain to be verified.
+- Pending 24-hour checks are display-only. Notification actions/scheduling, check completion and onboarding remain Sprint 3; dashboard, progression and parameter editing remain Sprint 4.
+- The static red-flag view is included now for F6 safety; no phase progression or medical recommendations are implemented.
+- Weekly progress counts at most one completed day, avoiding inflation from duplicate logs. MINIMAL does not alter phase/adherence state.
+- Stop at Sprint 2 for review. Existing wrapper, debug signing, CI versionCode, offline manifest and seed remain intact.
+
 ### Sprint 1 - 2026-10-06
 
 - Rename the application and all source/test packages to `it.finardi.schiena`; display name: Schiena.

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
+import it.finardi.schiena.domain.SessionType
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
@@ -20,6 +21,18 @@ interface HistoryDao {
 
     @Query("SELECT * FROM SessionLog ORDER BY date, id")
     suspend fun getSessions(): List<SessionLog>
+
+    @Query("SELECT * FROM SessionLog WHERE date = :date AND sessionType = :type ORDER BY id DESC LIMIT 1")
+    suspend fun getSession(date: LocalDate, type: SessionType): SessionLog?
+
+    @Query("DELETE FROM PainCheck WHERE sessionLogId = :sessionId")
+    suspend fun deletePainCheck(sessionId: Long)
+
+    @Query("SELECT * FROM PainCheck ORDER BY sessionLogId")
+    fun observePainChecks(): Flow<List<PainCheck>>
+
+    @Query("SELECT * FROM OfficeBreakEvent ORDER BY timestamp")
+    fun observeOfficeBreaks(): Flow<List<OfficeBreakEvent>>
 
     @Query("SELECT * FROM PainCheck ORDER BY sessionLogId")
     suspend fun getPainChecks(): List<PainCheck>

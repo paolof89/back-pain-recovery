@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_title">Sessione</string>
+    <string name="player_back">Esci dalla sessione</string>
+    <string name="player_empty">Nessun esercizio disponibile</string>
+    <string name="player_complete">Sessione terminata</string>
+    <string name="player_exercise_progress">Esercizio %1$d di %2$d</string>
+    <string name="player_set">Serie %1$d di %2$d</string>
+    <string name="player_reps">%1$d ripetizioni</string>
+    <string name="player_hold">Tenuta: %1$d secondi</string>
+    <string name="player_distance">Distanza: %1$d metri</string>
+    <string name="player_rest_prescription">Recupero tra serie: %1$d secondi</string>
+    <string name="player_recovery">Recupero</string>
+    <string name="player_left">Lato sinistro</string>
+    <string name="player_right">Lato destro</string>
+    <string name="player_repetition">Tenuta %1$d di %2$d</string>
+    <string name="player_seconds">%1$d s</string>
+    <string name="player_paused">In pausa</string>
+    <string name="player_resume">Riprendi</string>
+    <string name="player_pause">Pausa</string>
+    <string name="player_previous">Passaggio precedente</string>
+    <string name="player_next">Passaggio successivo</string>
+    <string name="player_skip">Salta esercizio</string>
+    <string name="player_abandon_title">Abbandonare la sessione?</string>
+    <string name="player_abandon_message">La sessione non verra\' salvata.</string>
+    <string name="player_abandon">Abbandona</string>
+    <string name="player_stay">Resta</string>
+</resources>

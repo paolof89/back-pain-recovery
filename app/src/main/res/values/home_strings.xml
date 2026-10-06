@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_today">Oggi</string>
+    <string name="home_loading">Caricamento...</string>
+    <string name="home_load_error">Impossibile caricare i dati di oggi. Riprova.</string>
+    <string name="home_phase_week">Settimana %1$d / %2$d nella fase</string>
+    <string name="home_weekly_progress">Obiettivo settimanale</string>
+    <string name="home_weekly_count">%1$d / %2$d sessioni completate</string>
+    <string name="home_today_session">Sessione di oggi</string>
+    <string name="home_start">Inizia</string>
+    <string name="home_minimal">Versione minima (5 min)</string>
+    <string name="home_quick_log">Registra sessione</string>
+    <string name="home_outcome_done">Fatta</string>
+    <string name="home_outcome_minimal">Minima</string>
+    <string name="home_outcome_skipped">Saltata</string>
+    <string name="home_pending_title">Check a 24 ore</string>
+    <string name="home_pending_count">Check in attesa: %1$d</string>
+    <string name="home_office_breaks">Pause ufficio</string>
+    <string name="home_breaks_count">%1$d / %2$d pause completate oggi</string>
+    <string name="home_work_off">Oggi non lavoro</string>
+    <string name="home_action_error">Impossibile aggiornare la preferenza di lavoro. Riprova.</string>
+    <string name="home_history_title">Ultimi 14 giorni</string>
+    <string name="home_history_empty">Nessuna sessione registrata negli ultimi 14 giorni.</string>
+    <string name="home_status_pending">Verde provvisorio: in attesa del check</string>
+    <string name="home_status_green">Verde: check completato</string>
+    <string name="home_status_yellow">Giallo: dolore da monitorare</string>
+    <string name="home_status_red">Rosso: dolore elevato o irradiato</string>
+    <string name="home_status_unverified">Non verificata</string>
+    <string name="home_status_not_applicable">Stato del dolore non applicabile</string>
+    <string name="home_red_flags">Segnali di allarme</string>
+</resources>

@@ -24,7 +24,13 @@ jobs:
       - name: Test, lint, build
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest lintDebug assembleDebug -PversionCode=${{ github.run_number }}
+          ./gradlew testDebugUnitTest lintDebug assembleDebug assembleDebugAndroidTest -PversionCode=${{ github.run_number }}
+
+      - name: Upload instrumented test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-test-apk
+          path: app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
       - name: Upload test reports (on failure)
         if: failure()
