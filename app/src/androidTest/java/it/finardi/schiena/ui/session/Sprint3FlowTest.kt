@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -63,7 +64,7 @@ class Sprint3FlowTest {
         val restoration = StateRestorationTester(compose)
         restoration.setContent { MaterialTheme { PainCheckScreen(log.id, state,
             onSave = { pain, baseline -> saves += pain to baseline; state = state.copy(error = true) }, onRetry = {}, onBack = {}) } }
-        compose.onNode(hasProgressBarRangeInfo()).performSemanticsAction(SemanticsActions.SetProgress) { it(6f) }
+        compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.ProgressBarRangeInfo)).performSemanticsAction(SemanticsActions.SetProgress) { it(6f) }
         text(R.string.s3_no).performScrollTo().performClick()
         text(R.string.s3_save).performScrollTo().performClick()
         text(R.string.s3_check_error).performScrollTo().assertIsDisplayed()
