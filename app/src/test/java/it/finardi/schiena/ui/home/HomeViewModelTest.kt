@@ -174,6 +174,21 @@ class HomeViewModelTest {
         )
 
         assertEquals(1, snapshot(logs = logs, checks = checks).pendingChecks)
+        assertEquals(3L, snapshot(logs = logs, checks = checks).pendingSessionId)
+    }
+
+    @Test
+    fun pendingCardSelectsOldestEligibleIdAndHasNoIdWhenEmpty() {
+        val logs = listOf(log(5, today.minusDays(1)), log(4, today.minusDays(2)), log(2, today.minusDays(2)))
+        assertEquals(2L, snapshot(logs = logs).pendingSessionId)
+        assertNull(snapshot().pendingSessionId)
+    }
+
+    @Test
+    fun previouslyExpiredSessionsDoNotReappearWhenCheckTimeChanges() {
+        val expired = log(1, today.minusDays(1)).copy(status = it.finardi.schiena.domain.SessionStatus.UNVERIFIED)
+        assertEquals(0, snapshot(logs = listOf(expired)).pendingChecks)
+        assertNull(snapshot(logs = listOf(expired)).pendingSessionId)
     }
 
     @Test

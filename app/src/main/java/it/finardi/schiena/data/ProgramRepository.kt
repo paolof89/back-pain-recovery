@@ -1,5 +1,6 @@
 package it.finardi.schiena.data
 
+import androidx.room.withTransaction
 import it.finardi.schiena.domain.SessionType
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -31,6 +32,13 @@ class ProgramRepository @Inject constructor(
 
     suspend fun setPlanEntry(entry: WeekPlanEntry) {
         database.programDao().upsertPlanEntry(entry)
+    }
+
+    suspend fun setPlan(entries: List<WeekPlanEntry>) {
+        require(entries.size == 7 && entries.map { it.dayOfWeek }.toSet() == DayOfWeek.entries.toSet())
+        database.withTransaction {
+            entries.forEach { database.programDao().upsertPlanEntry(it) }
+        }
     }
 
     suspend fun setPlanEntry(dayOfWeek: DayOfWeek, sessionType: SessionType, reminderTime: LocalTime) {

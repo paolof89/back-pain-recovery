@@ -22,6 +22,9 @@ interface HistoryDao {
     @Query("SELECT * FROM SessionLog ORDER BY date, id")
     suspend fun getSessions(): List<SessionLog>
 
+    @Query("SELECT * FROM SessionLog WHERE id = :id")
+    suspend fun getSessionById(id: Long): SessionLog?
+
     @Query("SELECT * FROM SessionLog WHERE date = :date AND sessionType = :type ORDER BY id DESC LIMIT 1")
     suspend fun getSession(date: LocalDate, type: SessionType): SessionLog?
 

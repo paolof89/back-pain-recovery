@@ -25,10 +25,13 @@ data class Settings(
     val breakIntervalMin: Int,
     val notificationsEnabled: Boolean = false,
     val workOffToday: LocalDate? = null,
+    val onboardingComplete: Boolean = false,
+    val disclaimerAccepted: Boolean = false,
 ) {
     fun isWorkOffToday(today: LocalDate): Boolean = workOffToday == today
 
     fun validated(): Settings {
+        require(!onboardingComplete || disclaimerAccepted) { "Disclaimer acceptance is required" }
         require(workDays.isNotEmpty()) { "At least one work day is required" }
         require(workStart < workEnd) { "Work start must precede work end" }
         require(breakIntervalMin in 60..90) { "Break interval must be between 60 and 90 minutes" }
@@ -60,6 +63,8 @@ class SettingsRepository @Inject constructor(
         val interval = intPreferencesKey("office_break_interval_min")
         val notifications = booleanPreferencesKey("notifications_enabled")
         val workOffDate = stringPreferencesKey("work_off_date")
+        val onboarding = booleanPreferencesKey("onboarding_complete")
+        val disclaimer = booleanPreferencesKey("disclaimer_accepted")
     }
 
     val settings: Flow<Settings?> = store.data.map { preferences ->
@@ -92,6 +97,8 @@ class SettingsRepository @Inject constructor(
             preferences[Keys.workEnd] = next.workEnd.toString()
             preferences[Keys.interval] = next.breakIntervalMin
             preferences[Keys.notifications] = next.notificationsEnabled
+            preferences[Keys.onboarding] = next.onboardingComplete
+            preferences[Keys.disclaimer] = next.disclaimerAccepted
             if (next.workOffToday == null) preferences.remove(Keys.workOffDate)
             else preferences[Keys.workOffDate] = next.workOffToday.toString()
         }
@@ -111,5 +118,7 @@ class SettingsRepository @Inject constructor(
         breakIntervalMin = checkNotNull(preferences[Keys.interval]),
         notificationsEnabled = preferences[Keys.notifications] ?: false,
         workOffToday = preferences[Keys.workOffDate]?.let(LocalDate::parse),
+        onboardingComplete = preferences[Keys.onboarding] ?: false,
+        disclaimerAccepted = preferences[Keys.disclaimer] ?: false,
     )
 }

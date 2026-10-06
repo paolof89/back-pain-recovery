@@ -27,8 +27,27 @@ timed holds, both sides and rest between sets. Backgrounding or recreating the
 player pauses it; resume explicitly. A saved log updates an existing entry for
 the same date and session type rather than inflating weekly progress.
 
-Notifications, completion of 24-hour checks, onboarding and progression remain
-outside Sprint 2. Pending checks are shown but cannot yet be completed.
+## Sprint 3
+
+First launch asks for explicit disclaimer acceptance and lets you configure the
+weekly schedule, work days/window, break interval and check time. Settings stay
+available from Today. Denied notification or exact-alarm permissions do not
+block session logging; warnings and system-settings links remain available.
+
+Session, recall, office and pain notifications support quick actions and
+snoozes. Exact alarms fall back to inexact when permission is unavailable.
+Only the next office break is scheduled. Boot, time/timezone changes and saved
+plan/settings/history changes trigger rescheduling. Weekly notifications use
+WorkManager and open the plan; the Sprint 4 dashboard is not implemented yet.
+
+Eligible strength/Pilates DONE or MINIMAL logs can be checked from the Home
+card or notification. The check is due at the configured time on the next day
+and expires 48 elapsed hours later. Red/yellow signals are never cleared just
+because a check expires; absence of a PainCheck identifies an unverified log.
+
+Long press the version in Settings to open Debug: alarm ledger, latest 50
+events, last local crash stack trace and a test-notification button. No data
+is sent off-device.
 
 ## Verification
 
@@ -48,3 +67,13 @@ After installing the release APK on the physical device, verify:
 - Returning from safety information keeps the form. Re-logging updates the existing entry.
 - Saving, then rotating on the weekly plan, does not reset navigation to Today.
 - Large fonts and dark theme remain usable.
+
+For Sprint 3, also verify on the physical device:
+- Deny permissions during onboarding, accept the disclaimer and confirm the app remains usable with a notification warning.
+- Enable notifications/exact alarms, save a near-future session time and confirm Debug shows the new trigger.
+- With the screen off in Doze, check delivery timing, then reboot and confirm alarms are restored. Do not force-stop the app: Android suppresses alarms until it is launched again.
+- Exercise Inizia, Minima, Rimanda 1h, recall Salta oggi, and office Fatto/Snooze/Salta with the app both running and fully closed.
+- Toggle Oggi non lavoro and confirm office alarms/notifications stop for that date; change the system timezone and inspect recalculated triggers.
+- For a next-day strength/Pilates log, complete the Home check and notification Tutto ok; verify duplicate actions do not overwrite the check and red/yellow colors cannot become green.
+- Verify expired checks are unavailable, Debug test notifications appear, and a real crash stack trace is retained after reopening.
+- Confirm changing the plan reschedules alarms within one second on the device; this timing acceptance criterion is not established by static checks.

@@ -63,6 +63,10 @@ fun HomeScreen(
     onPlan: () -> Unit,
     onRedFlags: () -> Unit,
     onWorkOff: (Boolean) -> Unit,
+    onSettings: () -> Unit = {},
+    onPainCheck: (Long) -> Unit = {},
+    notificationsDisabled: Boolean = false,
+    notificationRequestError: Boolean = false,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale)
@@ -86,6 +90,15 @@ fun HomeScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     HomeHeading(stringResource(R.string.home_today))
                     today?.let { Text(it.format(dateFormatter), style = MaterialTheme.typography.bodyLarge) }
+                    OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                        Text(stringResource(R.string.s3_settings))
+                    }
+                    if (notificationsDisabled) {
+                        HomeMessage(stringResource(R.string.s3_notifications_off), MaterialTheme.colorScheme.error)
+                    }
+                    if (notificationRequestError) {
+                        HomeMessage(stringResource(R.string.s3_request_invalid), MaterialTheme.colorScheme.error)
+                    }
                     OutlinedButton(onClick = onPlan, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                         Text(stringResource(R.string.weekly_plan_title))
                     }
@@ -112,13 +125,15 @@ fun HomeScreen(
                 else -> {
                     if (state.pendingChecks > 0) {
                         item {
-                            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
+                            Card(onClick = { state.pendingSessionId?.let(onPainCheck) }, enabled = state.pendingSessionId != null,
+                                modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
                                 Column(
                                     modifier = Modifier.padding(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
                                 ) {
                                     HomeHeading(stringResource(R.string.home_pending_title))
                                     HomeMessage(stringResource(R.string.home_pending_count, state.pendingChecks))
+                                    Text(stringResource(R.string.s3_check_open))
                                 }
                             }
                         }

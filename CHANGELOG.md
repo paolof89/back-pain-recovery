@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Sprint 3 - 2026-10-06
+
+- Add explicit disclaimer onboarding, database-backed weekly schedule editing, work window/days, check time and notification preferences.
+- Request notification permission and link exact-alarm and battery settings; keep the app usable with denied permissions and show persistent warnings.
+- Add exact allow-idle session/check/office alarms with inexact fallback, one daily recall, session/office snoozes and quick receiver actions.
+- Chain only the next office break; respect work days, work window and dated work-off preference. Reschedule on boot, time/timezone changes, app update, permission changes and persisted data changes.
+- Add separate channels and persisted rotating reminder pools; use neutral copy for red/radiating checks. Weekly notification and maintenance use nonpunctual WorkManager jobs.
+- Complete eligible 24-hour checks from Home or notifications; atomically save pain and final status, reject duplicate/early/expired actions and preserve red/yellow safety signals.
+- Define the check window as 48 elapsed hours from the next-day configured check time because logs store a date, not session completion time. Unchecked low-pain logs become UNVERIFIED; unchecked red/yellow logs retain their safety color and have no PainCheck.
+- Add cold/warm notification navigation, transactional seven-day plan replacement, a system-zone-aware injected Clock and protection for due alarm tokens during cold-process startup.
+- Add hidden Debug via long press on the settings version: scheduled alarm ledger, last 50 receiver/notification events, locally persisted last crash and test notification.
+- Add unit/Room/Compose coverage for scheduling boundaries, stale actions, copy rotation, onboarding persistence, notification requests, check windows, traffic-light confirmation and daylight-saving expiry.
+
+### Sprint 3 Verification
+
+- Editor diagnostics reported no errors. XML parsing, duplicate string names, Kotlin string references, seed integrity, offline/backup manifest assertions and git diff whitespace checks passed locally.
+- No Gradle, Kotlin compilation, Android lint or Kotlin tests were run locally, following the CI-only build policy. CI must run testDebugUnitTest, lintDebug, assembleDebug and assembleDebugAndroidTest.
+- Instrumented tests are compiled but not executed by the current CI. Physical-device checks remain required for permission denial/grant, cold/warm actions, Doze timing, reboot, timezone change, battery restrictions and crash capture.
+- Exact permission does not bypass force-stop or manufacturer restrictions; inexact fallback cannot promise delivery within one minute. Weekly review notification opens the weekly plan; dashboard/review content and progression remain Sprint 4.
+- Room plan replacement is atomic; plan and DataStore settings are separate stores, so a failed settings write can leave the new plan saved until retry. The UI retains the draft and reports failure.
+- Stop at Sprint 3 for review. No commit or push performed; wrapper, signing, CI versionCode and seed remain intact.
+
 ### Sprint 2 - 2026-10-06
 
 - Open on Today with the daily database-backed session, ISO-week progress, phase week, office-break totals, dated work-off toggle and pending-check count.

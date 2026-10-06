@@ -36,6 +36,7 @@ data class HomeUiState(
     val pendingChecks: Int = 0,
     val history: List<SessionLog> = emptyList(),
     val actionError: Boolean = false,
+    val pendingSessionId: Long? = null,
 )
 
 internal fun homeSnapshot(
@@ -48,13 +49,12 @@ internal fun homeSnapshot(
     val workOff = settings?.isWorkOffToday(today) == true
     val working = settings != null && today.dayOfWeek in settings.workDays && !workOff
     val checked = checks.map { it.sessionLogId }.toSet()
-    val pending = logs.count {
-        it.outcome != SessionOutcome.SKIPPED &&
-            it.sessionType in setOf(SessionType.STRENGTH_A, SessionType.STRENGTH_B, SessionType.PILATES) &&
+    val pending = logs.filter {
+        PainCheckWindow.required(it.sessionType, it.outcome) &&
+            it.status != SessionStatus.UNVERIFIED &&
             it.id !in checked && settings != null &&
-            clock.instant() >= it.date.plusDays(1).atTime(settings.checkTime).atZone(clock.zone).toInstant() &&
-            clock.instant() < it.date.plusDays(3).atTime(settings.checkTime).atZone(clock.zone).toInstant()
-    }
+            PainCheckWindow.pending(it.date, settings.checkTime, clock.zone, clock.instant())
+    }.sortedWith(compareBy<SessionLog> { it.date }.thenBy { it.id })
     return HomeUiState(
         loading = false, error = phase == null || entry == null || program == null || settings == null,
         today = today, entry = entry, phase = phase,
@@ -63,7 +63,7 @@ internal fun homeSnapshot(
         completed = weeklyCompleted(logs.map { ProgressEntry(it.date, it.outcome) }, today),
         breaksDone = breaks.count { it.action == OfficeBreakAction.DONE && it.timestamp.atZone(clock.zone).toLocalDate() == today },
         breaksTarget = if (working) (Duration.between(settings!!.workStart, settings.workEnd).toMinutes() / settings.breakIntervalMin).toInt() else 0,
-        workOff = workOff, pendingChecks = pending,
+        workOff = workOff, pendingChecks = pending.size, pendingSessionId = pending.firstOrNull()?.id,
         history = logs.filter { it.date <= today }.sortedWith(compareByDescending<SessionLog> { it.date }.thenByDescending { it.id }),
     )
 }
@@ -136,6 +136,18 @@ class HomeViewModel @Inject constructor(
         val snapshot = home.value
         if (snapshot.loading || snapshot.error || session.value.saving) return
         prepare(SessionContext(checkNotNull(snapshot.today), checkNotNull(snapshot.entry).sessionType, checkNotNull(snapshot.phase).id, minimal), requiresPlayer)
+    }
+
+    fun beginFromNotification(sessionId: Long?, minimal: Boolean): Boolean {
+        val snapshot = home.value
+        if (snapshot.loading || snapshot.error || session.value.saving) return false
+        if (sessionId == null) {
+            begin(minimal)
+        } else {
+            val log = snapshot.history.firstOrNull { it.id == sessionId } ?: return false
+            prepare(SessionContext(log.date, log.sessionType, log.phaseId, minimal), requiresPlayer = true)
+        }
+        return true
     }
 
     private fun prepare(context: SessionContext, requiresPlayer: Boolean) {

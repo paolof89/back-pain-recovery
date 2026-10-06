@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="reminder_session">
+        <item>La tua schiena ha chiesto un meeting. Niente slide, promesso.</item>
+        <item>Non serve la sessione perfetta. Serve una sessione.</item>
+        <item>Anche cinque minuti trovano spazio oggi.</item>
+    </string-array>
+    <string-array name="reminder_recall">
+        <item>Ancora in tempo per la versione minima.</item>
+        <item>Cinque minuti, senza cercare la sessione perfetta.</item>
+    </string-array>
+    <string-array name="reminder_pain">
+        <item>Come sta la schiena oggi? Registra il check.</item>
+        <item>Un momento per registrare come ti senti.</item>
+    </string-array>
+    <string-array name="reminder_office">
+        <item>Anche il foglio di calcolo aspetta una pausa.</item>
+        <item>La sedia non fa carriera. Una pausa?</item>
+        <item>Micro-pausa, poi torni alle tue cose.</item>
+    </string-array>
+    <string-array name="reminder_weekly">
+        <item>Settimana chiusa. Vediamo i numeri, senza giudizi.</item>
+        <item>Un momento per guardare la settimana appena trascorsa.</item>
+    </string-array>
+</resources>

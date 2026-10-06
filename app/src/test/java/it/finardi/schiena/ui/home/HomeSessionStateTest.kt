@@ -78,6 +78,31 @@ class HomeSessionStateTest : ProgramDataFixture() {
     }
 
     @Test
+    fun notificationUsesReferencedLogContextRatherThanTodaysPlan() = runBlocking {
+        val expected = SessionContext(legacyDate, SessionType.STRENGTH_B, 2, true)
+        val id = sessions.save(expected.date, expected.type, expected.phaseId, SessionOutcome.DONE, 2, false, null, "Referenced")
+        val savedState = SavedStateHandle()
+        createViewModel(savedState)
+        awaitHome { it.history.any { log -> log.id == id } }
+
+        assertTrue(viewModel.beginFromNotification(id, minimal = true))
+        val state = awaitSession()
+        assertEquals(expected, state.context)
+        assertEquals(id, state.previous?.id)
+        assertSavedContext(savedState, expected, requiresPlayer = true)
+    }
+
+    @Test
+    fun missingNotificationIdCannotSilentlyBeginTodaysSession() = runBlocking {
+        createViewModel()
+        awaitHome()
+        assertFalse(viewModel.beginFromNotification(Long.MAX_VALUE, minimal = false))
+        assertEquals(SessionUiState(), viewModel.sessionState.value)
+        assertTrue(viewModel.beginFromNotification(null, minimal = false))
+        assertEquals(today, awaitSession().context?.date)
+    }
+
+    @Test
     fun skippedStrengthQuickLogIsAllowedWithAllStrengthPrescriptionsDisabled() = runBlocking {
         disableStrengthPrescriptions()
         val savedState = SavedStateHandle()

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notif_channel_sessions">Sessioni</string>
+    <string name="notif_channel_pain">Check del dolore</string>
+    <string name="notif_channel_office">Pause ufficio</string>
+    <string name="notif_channel_weekly">Riepilogo settimanale</string>
+    <string name="notif_title_session">La sessione di oggi</string>
+    <string name="notif_title_pain">Check del dolore</string>
+    <string name="notif_title_office">Pausa ufficio</string>
+    <string name="notif_title_weekly">La tua settimana</string>
+    <string name="notif_pain_neutral">Registra come ti senti oggi. Se il dolore alla gamba compare o peggiora, contatta il medico.</string>
+    <string name="notif_start">Inizia</string>
+    <string name="notif_minimal">Minima 5\'</string>
+    <string name="notif_snooze_hour">Rimanda 1h</string>
+    <string name="notif_skip_today">Salta oggi</string>
+    <string name="notif_all_ok">Tutto ok</string>
+    <string name="notif_open">Apri</string>
+    <string name="notif_done">Fatto</string>
+    <string name="notif_snooze_quarter">Snooze 15\'</string>
+    <string name="notif_skip">Salta</string>
+    <string name="notif_test_title">Schiena: notifica di test</string>
+    <string name="notif_test_body">Le notifiche sono disponibili su questo dispositivo.</string>
+</resources>

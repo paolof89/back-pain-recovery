@@ -12,6 +12,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Singleton
 
 private val Context.schienaSettings: DataStore<Preferences> by preferencesDataStore(name = "schiena_settings")
@@ -26,7 +28,11 @@ object DatabaseModule {
 
     @Provides fun provideProgramDao(database: AppDatabase): ProgramDao = database.programDao()
     @Provides fun provideHistoryDao(database: AppDatabase): HistoryDao = database.historyDao()
-    @Provides @Singleton fun provideClock(): Clock = Clock.systemDefaultZone()
+    @Provides @Singleton fun provideClock(): Clock = object : Clock() {
+        override fun getZone(): ZoneId = ZoneId.systemDefault()
+        override fun withZone(zone: ZoneId): Clock = Clock.system(zone)
+        override fun instant(): Instant = Instant.now()
+    }
     @Provides @Singleton
     fun provideSettingsStore(@ApplicationContext context: Context): DataStore<Preferences> = context.schienaSettings
 }

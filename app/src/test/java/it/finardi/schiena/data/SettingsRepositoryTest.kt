@@ -27,6 +27,33 @@ import org.robolectric.annotation.Config
 @Config(application = Application::class, sdk = [28])
 class SettingsRepositoryTest : ProgramDataFixture() {
     @Test
+    fun onboardingFlagsDefaultFalseForInitializedLegacyPreferences() = runTest {
+        repository.initialize()
+        val current = settingsRepository.settings.first()!!
+        assertFalse(current.disclaimerAccepted)
+        assertFalse(current.onboardingComplete)
+    }
+
+    @Test
+    fun onboardingRequiresExplicitAcceptanceAndPersistsAcrossRepositoryRecreation() = runTest {
+        repository.initialize()
+        val before = settingsRepository.settings.first()
+        assertTrue(runCatching { settingsRepository.update { it.copy(onboardingComplete = true) } }.exceptionOrNull() is IllegalArgumentException)
+        assertEquals(before, settingsRepository.settings.first())
+        settingsRepository.update { it.copy(disclaimerAccepted = true) }
+        assertFalse(settingsRepository.settings.first()!!.onboardingComplete)
+        settingsRepository.update { it.copy(onboardingComplete = true) }
+        val recreated = SettingsRepository(store, clock)
+        assertTrue(recreated.settings.first()!!.disclaimerAccepted)
+        assertTrue(recreated.settings.first()!!.onboardingComplete)
+        settingsRepository.setWorkOffToday(true)
+        repository.initialize()
+        repository.restoreDefaults()
+        assertTrue(recreated.settings.first()!!.onboardingComplete)
+        assertTrue(recreated.settings.first()!!.disclaimerAccepted)
+    }
+
+    @Test
     fun settingsAreAbsentUntilSeedDefaultsInitialize() = runTest {
         assertNull(settingsRepository.settings.first())
         assertTrue(runCatching { settingsRepository.update { it.copy(breakIntervalMin = 60) } }.exceptionOrNull() is IllegalStateException)

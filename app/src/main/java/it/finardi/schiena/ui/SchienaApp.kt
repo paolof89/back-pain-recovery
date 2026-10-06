@@ -1,10 +1,12 @@
 package it.finardi.schiena.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,6 +29,13 @@ import it.finardi.schiena.ui.log.SessionLogScreen
 import it.finardi.schiena.ui.plan.WeeklyPlanRoute
 import it.finardi.schiena.ui.player.SessionPlayerScreen
 import it.finardi.schiena.ui.redflags.RedFlagsScreen
+import it.finardi.schiena.ui.onboarding.OnboardingScreen
+import it.finardi.schiena.ui.settings.SettingsScreen
+import it.finardi.schiena.ui.settings.SettingsViewModel
+import it.finardi.schiena.ui.paincheck.PainCheckScreen
+import it.finardi.schiena.ui.paincheck.PainCheckViewModel
+import it.finardi.schiena.ui.debug.DebugScreen
+import it.finardi.schiena.ui.debug.DebugViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable data object Home : NavKey
@@ -34,17 +43,34 @@ import kotlinx.serialization.Serializable
 @Serializable data object Player : NavKey
 @Serializable data object RedFlags : NavKey
 @Serializable data class Log(val outcome: String) : NavKey
+@Serializable data object AppSettings : NavKey
+@Serializable data object Debug : NavKey
+@Serializable data class CheckPain(val sessionId: Long) : NavKey
 
 @Composable
-fun SchienaApp(viewModel: HomeViewModel = hiltViewModel()) {
+fun SchienaApp(
+    viewModel: HomeViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    notificationRequest: NotificationRequest? = null,
+    onNotificationConsumed: (String) -> Unit = {},
+) {
     val home by viewModel.uiState.collectAsStateWithLifecycle()
     val session by viewModel.sessionState.collectAsStateWithLifecycle()
+    val preferences by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val backStack = rememberNavBackStack(Home)
+    var consumedToken by rememberSaveable { mutableStateOf<String?>(null) }
+    var notificationError by rememberSaveable { mutableStateOf(false) }
+    var onboardingRedFlags by rememberSaveable { mutableStateOf(false) }
+    val ready = !home.loading && !home.error && !preferences.loading && !preferences.loadError && preferences.persisted != null
+    val onboarded = preferences.persisted?.let { it.onboardingComplete && it.disclaimerAccepted } == true
     val back = { if (backStack.size > 1) { backStack.removeAt(backStack.lastIndex) }; Unit }
     val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, viewModel) {
+    DisposableEffect(lifecycleOwner, viewModel, settingsViewModel) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) viewModel.refreshDate()
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshDate()
+                settingsViewModel.refreshPermissions()
+            }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
@@ -56,9 +82,47 @@ fun SchienaApp(viewModel: HomeViewModel = hiltViewModel()) {
             viewModel.acknowledgeSave()
         }
     }
+    LaunchedEffect(notificationRequest?.token, ready, onboarded, session.saving, preferences.saving) {
+        val request = notificationRequest
+        if (request != null && ready && onboarded && !session.saving && !preferences.saving) {
+            if (consumedToken != request.token) {
+                notificationError = false
+                val destination: NavKey? = when (request.action) {
+                    "start", "minimal" -> {
+                        val minimal = request.action == "minimal"
+                        if (viewModel.beginFromNotification(request.sessionId, minimal)) {
+                            val type = viewModel.sessionState.value.context?.type
+                            if (minimal || type in setOf(SessionType.STRENGTH_A, SessionType.STRENGTH_B)) Player else Log(SessionOutcome.DONE.name)
+                        } else null
+                    }
+                    "pain" -> (request.sessionId ?: home.pendingSessionId)?.let { CheckPain(it) }
+                    "weekly" -> Plan
+                    else -> null
+                }
+                backStack.clear()
+                backStack.add(Home)
+                if (destination != null) backStack.add(destination) else notificationError = true
+                consumedToken = request.token
+            }
+            onNotificationConsumed(request.token)
+        }
+    }
+    if (!ready) {
+        HomeScreen(home.copy(loading = home.loading || preferences.loading, error = home.error || preferences.loadError),
+            onRetry = { viewModel.retry(); settingsViewModel.retry() }, onStart = {}, onMinimal = {}, onLog = {},
+            onPlan = {}, onRedFlags = {}, onWorkOff = {})
+        return
+    }
+    if (!onboarded) {
+        BackHandler(enabled = onboardingRedFlags) { onboardingRedFlags = false }
+        if (onboardingRedFlags) RedFlagsScreen(onBack = { onboardingRedFlags = false })
+        else OnboardingScreen(preferences, settingsViewModel::edit, { settingsViewModel.save(onboarding = true) },
+            settingsViewModel::retry, { onboardingRedFlags = true }, settingsViewModel::refreshPermissions)
+        return
+    }
     NavDisplay(
         backStack = backStack,
-        onBack = { if (!session.saving) back() },
+        onBack = { if (!session.saving && !preferences.saving) back() },
         entryDecorators = listOf(rememberSaveableStateHolderNavEntryDecorator()),
         entryProvider = { destination ->
             NavEntry(destination) {
@@ -74,6 +138,10 @@ fun SchienaApp(viewModel: HomeViewModel = hiltViewModel()) {
                         onLog = { outcome -> viewModel.begin(outcome == SessionOutcome.MINIMAL, requiresPlayer = false); backStack.add(Log(outcome.name)) },
                         onPlan = { backStack.add(Plan) }, onRedFlags = { backStack.add(RedFlags) },
                         onWorkOff = viewModel::setWorkOff,
+                        onSettings = { backStack.add(AppSettings) },
+                        onPainCheck = { backStack.add(CheckPain(it)) },
+                        notificationsDisabled = preferences.persisted?.notificationsEnabled != true || !preferences.notificationsAllowed,
+                        notificationRequestError = notificationError,
                     )
                     Plan -> Column(Modifier.fillMaxSize()) {
                         IconButton(onClick = back, modifier = Modifier.statusBarsPadding()) {
@@ -82,6 +150,28 @@ fun SchienaApp(viewModel: HomeViewModel = hiltViewModel()) {
                         Box(Modifier.weight(1f)) { WeeklyPlanRoute() }
                     }
                     RedFlags -> RedFlagsScreen(onBack = back)
+                    AppSettings -> SettingsScreen(preferences, onboarding = false, onEdit = settingsViewModel::edit,
+                        onSave = { settingsViewModel.save(onboarding = false) }, onRetry = settingsViewModel::retry,
+                        onBack = back, onRedFlags = { backStack.add(RedFlags) }, onDebug = { backStack.add(Debug) },
+                        onPermissionsChanged = settingsViewModel::refreshPermissions)
+                    Debug -> {
+                        val debugViewModel: DebugViewModel = hiltViewModel()
+                        val debug by debugViewModel.uiState.collectAsStateWithLifecycle()
+                        LaunchedEffect(Unit) { debugViewModel.refresh() }
+                        DebugScreen(debug, { debugViewModel.refresh() }, { debugViewModel.refresh(test = true) }, back)
+                    }
+                    is CheckPain -> {
+                        val checkViewModel: PainCheckViewModel = hiltViewModel()
+                        val check by checkViewModel.uiState.collectAsStateWithLifecycle()
+                        LaunchedEffect(destination.sessionId) { checkViewModel.load(destination.sessionId) }
+                        LaunchedEffect(check.saved) {
+                            if (check.saved && backStack.lastOrNull() == destination) {
+                                backStack.clear(); backStack.add(Home); viewModel.refreshDate()
+                            }
+                        }
+                        BackHandler(enabled = check.saving) {}
+                        PainCheckScreen(destination.sessionId, check, checkViewModel::save, checkViewModel::retry, back)
+                    }
                     Player, is Log -> {
                         when {
                             session.loading -> SessionLoading(false, viewModel::retrySession, back)
