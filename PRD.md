@@ -10,7 +10,7 @@ App Android personale per seguire con costanza un programma di esercizi per lomb
 
 | | |
 |---|---|
-| **Problema** | L'utente conosce gli esercizi ma non è costante: salta le sessioni quando ha poco tempo, molla quando rompe la streak, si dimentica le pause in ufficio. |
+| **Problema** | L'utente fatica a capire cosa fare oggi e come eseguire gli esercizi; configurazione e scelte visibili ostacolano la costanza. Non si assume che conosca gli esercizi. |
 | **Obiettivo** | Aderenza ≥80% alle sessioni pianificate per 12 settimane, con progressione di fase sicura, guidata dal dolore. |
 | **Metrica north star** | % di settimane in cui l'obiettivo settimanale è raggiunto. |
 
@@ -40,6 +40,17 @@ App Android personale per seguire con costanza un programma di esercizi per lomb
 | F11 | Modifica dei parametri degli esercizi e schermata red flag | MVP |
 
 **Fuori scope MVP (v2):** widget sulla home, export CSV/PDF per il fisiatra, Health Connect/smartwatch, video degli esercizi, editor completo dei template, backup.
+
+### Sprint di recupero UX - 2026-10-07
+
+Le seguenti variazioni sostituiscono la presentazione prevista in F1, F3 e F4,
+senza cambiare prescrizioni, semaforo, progressione o requisiti delle notifiche.
+
+- **F1:** primo avvio separato dalle impostazioni complete. Consenso esplicito e accesso a Oggi usando piano e orari gia' inizializzati dal seed. Permessi in una sezione facoltativa; giorni, orari e fascia lavorativa modificabili successivamente in Impostazioni. Gli utenti gia' configurati non ripetono il primo avvio.
+- **F3:** azione principale prima delle statistiche. Un controllo pendente ha priorita' visiva, ma non introduce un nuovo blocco clinico. La sessione registrata oggi per il tipo pianificato mostra risultato e modifica, non un nuovo avvio dominante. I tipi senza player mostrano "Registra attività". Versione minima sempre accessibile; registrazioni rapide, fase e pause in "Altre azioni"; storico recente nella destinazione Diario. Sicurezza, programma e impostazioni restano raggiungibili.
+- **F4:** preparazione prima del primo esercizio e a ogni cambio esercizio, con avvio esplicito. Indicazioni complete senza ellissi; apertura di "Come si fa" mette in pausa senza azzerare il tempo. Serie, lati e recuperi interni restano automatici come nel motore esistente. Per gli stage senza timer il comando principale conferma la serie completata.
+- **Guide visive:** immagini offline con descrizione accessibile e passaggi brevi, collegati per ID esercizio. Materiali autorizzati con fonte, licenza e revisione competente sono prerequisiti del rilascio delle dimostrazioni. Il catalogo iniziale e' vuoto: le cue esistenti sono disponibili, ma il requisito immagini resta aperto. Nessuna istruzione clinica nuova viene inventata per colmare questa lacuna.
+- **Verifica:** prova sul telefono senza spiegazioni esterne: individuare la prossima azione entro 10 secondi e raggiungere la preparazione dalla home in massimo due tocchi, escluso il controllo pendente. Validare font grandi, TalkBack, rotazione, ritorno dal background e aggiornamento senza perdita di dati. Non riprendere nuove feature prima della review di questo sprint.
 
 ---
 

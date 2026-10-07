@@ -29,9 +29,10 @@ the same date and session type rather than inflating weekly progress.
 
 ## Sprint 3
 
-First launch asks for explicit disclaimer acceptance and lets you configure the
-weekly schedule, work days/window, break interval and check time. Settings stay
-available from Today. Denied notification or exact-alarm permissions do not
+First launch asks for explicit disclaimer acceptance and opens Today with the
+existing seed defaults. Reminder permissions are optional; the full weekly
+schedule, work days/window, break interval and check time remain in Settings.
+Denied notification or exact-alarm permissions do not
 block session logging; warnings and system-settings links remain available.
 
 Session, recall, office and pain notifications support quick actions and
@@ -49,6 +50,26 @@ Long press the version in Settings to open Debug: alarm ledger, latest 50
 events, last local crash stack trace and a test-notification button. No data
 is sent off-device.
 
+## Guided UX Recovery
+
+Today now puts the next action before statistics. A pending pain check takes
+visual priority without blocking the session. Today's recorded planned session
+offers editing instead of another primary start. Non-player activities use an
+honest recording label. Minimal sessions remain available; quick logs, phase
+details and office-break controls are under Other actions. Recent logs live in
+Diary, with the existing textual safety statuses and red-flag access.
+
+The player starts in preparation and requires explicit confirmation before each
+new exercise, including changes via skip or navigation. Instructions are no
+longer truncated. Reopening instructions pauses playback without resetting it;
+internal sides, holds and recovery stages retain their existing timing.
+
+Offline image support reads `app/src/main/assets/guides/exercise_guides.json`.
+The catalog is intentionally empty pending authorized, clinically reviewed
+materials. Until then the player uses the existing database cues; visual
+demonstrations are **not complete**. See the guide asset README for the content
+contract. No database migration or seed replacement is required.
+
 ## Verification
 
 Builds run only in GitHub Actions. CI runs unit tests and lint, builds the app,
@@ -62,7 +83,7 @@ After installing the release APK on the physical device, verify:
 - Timer completion signals sound/vibration, and the screen stays on only in the player.
 - Pause, resume, previous/next, skip, app backgrounding and rotation behave correctly.
 - Minimal sessions and DONE count toward the weekly goal; SKIPPED does not.
-- Aerobic/Pilates/free logs validate duration; quick logs save in two taps plus the pain slider.
+- Aerobic/Pilates/free logs validate duration; quick logs from Today use three taps including Other actions, plus the pain slider.
 - Pain 4-5 is yellow; pain above 5 or radiating is red; radiating immediately opens safety information.
 - Returning from safety information keeps the form. Re-logging updates the existing entry.
 - Saving, then rotating on the weekly plan, does not reset navigation to Today.
@@ -77,3 +98,13 @@ For Sprint 3, also verify on the physical device:
 - For a next-day strength/Pilates log, complete the Home check and notification Tutto ok; verify duplicate actions do not overwrite the check and red/yellow colors cannot become green.
 - Verify expired checks are unavailable, Debug test notifications appear, and a real crash stack trace is retained after reopening.
 - Confirm changing the plan reschedules alarms within one second on the device; this timing acceptance criterion is not established by static checks.
+
+For guided recovery, also verify on the physical device:
+- On a separate test installation, consent and enter Today without editing seven days of settings. Do not clear or uninstall the real installation to test first launch.
+- Denied permissions do not block entry; full configuration remains reachable from the settings icon. Existing users do not repeat onboarding.
+- Identify the next action within 10 seconds without coaching. Start preparation in at most two taps from Today when no check is pending.
+- Check pending, already-recorded, non-player activity, loading and failure states. Minimal, direct log, skip, diary, work-off and safety remain reachable.
+- Leave preparation open: no timer starts. Confirm, complete or skip an exercise, and verify the next exercise waits for confirmation and scrolls to the top.
+- Reopen instructions, background, rotate and restore: time is not reset, playback does not silently resume and completion/log callbacks are not duplicated.
+- Verify all existing cue text is readable with large fonts and TalkBack. Verified images must be checked for exercise/laterality accuracy, usable framing and accessible descriptions before publication.
+- Run GuidedFlowTest and the existing instrumented suites on the device; CI compilation alone does not establish behavioral success.

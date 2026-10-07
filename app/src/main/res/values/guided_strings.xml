@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="guided_open_today">Vai a Oggi</string>
+    <string name="guided_reminders">Promemoria (facoltativo)</string>
+    <string name="guided_diary">Diario</string>
+    <string name="guided_other_actions">Altre azioni</string>
+    <string name="guided_check">Compila controllo</string>
+    <string name="guided_record_activity">Registra attività</string>
+    <string name="guided_recorded">Sessione di oggi registrata</string>
+    <string name="guided_edit_record">Modifica registrazione</string>
+    <string name="guided_prepare">Preparazione</string>
+    <string name="guided_ready">Sono pronto</string>
+    <string name="guided_instructions">Come si fa</string>
+    <string name="guided_set_done">Serie completata</string>
+    <string name="guided_per_side">Per ogni lato</string>
+</resources>

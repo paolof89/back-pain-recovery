@@ -22,6 +22,7 @@ import it.finardi.schiena.domain.SessionOutcome
 import it.finardi.schiena.domain.SessionType
 import it.finardi.schiena.ui.home.HomeScreen
 import it.finardi.schiena.ui.home.HomeUiState
+import it.finardi.schiena.ui.onboarding.OnboardingScreen
 import it.finardi.schiena.ui.paincheck.PainCheckScreen
 import it.finardi.schiena.ui.paincheck.PainCheckUiState
 import it.finardi.schiena.ui.settings.SettingsDraft
@@ -91,12 +92,14 @@ class Sprint3FlowTest {
         var state by mutableStateOf(SettingsUiState(loading = false, persisted = settings, draft = SettingsDraft.from(settings, plan),
             notificationsAllowed = true, exactAllowed = true))
         var saves = 0
-        compose.setContent { MaterialTheme { SettingsScreen(state, onboarding = true,
+        compose.setContent { MaterialTheme { OnboardingScreen(state,
             onEdit = { transform -> state = state.copy(draft = transform(state.draft!!)) },
-            onSave = { saves++; state = state.copy(saveError = true) }, onRetry = {}, onBack = {}, onRedFlags = {}, onDebug = {}, onPermissionsChanged = {}) } }
-        text(R.string.s3_finish).performScrollTo().assertIsNotEnabled()
-        compose.onNode(isToggleable() and hasAnySibling(hasText(context.getString(R.string.s3_accept)))).performScrollTo().performClick()
-        text(R.string.s3_finish).performScrollTo().assertIsEnabled().performClick()
+            onSave = { saves++; state = state.copy(saveError = true) }, onRetry = {}, onRedFlags = {}, onPermissionsChanged = {}) } }
+        text(R.string.guided_open_today).assertIsDisplayed().assertIsNotEnabled()
+        text(R.string.s3_work_days).assertDoesNotExist()
+        text(R.string.weekly_plan_title).assertDoesNotExist()
+        compose.onNode(isToggleable() and hasText(context.getString(R.string.s3_accept))).performClick()
+        text(R.string.guided_open_today).assertIsEnabled().performClick()
         text(R.string.s3_save_error).performScrollTo().assertIsDisplayed()
         text(R.string.retry).performScrollTo().performClick()
         compose.runOnIdle { assertEquals(2, saves); assertTrue(state.draft!!.accepted) }
@@ -110,9 +113,9 @@ class Sprint3FlowTest {
             phase = Phase(1, "Fase test", 4), pendingChecks = 1, pendingSessionId = log.id)
         compose.setContent { MaterialTheme { HomeScreen(home, onRetry = {}, onStart = {}, onMinimal = {}, onLog = {},
             onPlan = {}, onRedFlags = {}, onWorkOff = {}, onSettings = { settingsOpens++ }, onPainCheck = { selected = it }, notificationsDisabled = true) } }
-        text(R.string.s3_notifications_off).assertIsDisplayed()
-        text(R.string.s3_settings).performClick()
-        text(R.string.s3_check_open).performScrollTo().performClick()
+        text(R.string.s3_notifications_off).performScrollTo().assertIsDisplayed()
+        compose.onNodeWithContentDescription(context.getString(R.string.s3_settings)).performScrollTo().performClick()
+        text(R.string.guided_check).performScrollTo().performClick()
         compose.runOnIdle { assertEquals(log.id, selected); assertEquals(1, settingsOpens) }
     }
 

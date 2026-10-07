@@ -24,6 +24,7 @@ import it.finardi.schiena.R
 import it.finardi.schiena.domain.SessionOutcome
 import it.finardi.schiena.domain.SessionType
 import it.finardi.schiena.ui.home.HomeScreen
+import it.finardi.schiena.ui.home.DiaryScreen
 import it.finardi.schiena.ui.home.HomeViewModel
 import it.finardi.schiena.ui.log.SessionLogScreen
 import it.finardi.schiena.ui.plan.WeeklyPlanRoute
@@ -39,6 +40,7 @@ import it.finardi.schiena.ui.debug.DebugViewModel
 import kotlinx.serialization.Serializable
 
 @Serializable data object Home : NavKey
+@Serializable data object Diary : NavKey
 @Serializable data object Plan : NavKey
 @Serializable data object Player : NavKey
 @Serializable data object RedFlags : NavKey
@@ -139,10 +141,12 @@ fun SchienaApp(
                         onPlan = { backStack.add(Plan) }, onRedFlags = { backStack.add(RedFlags) },
                         onWorkOff = viewModel::setWorkOff,
                         onSettings = { backStack.add(AppSettings) },
+                        onDiary = { backStack.add(Diary) },
                         onPainCheck = { backStack.add(CheckPain(it)) },
                         notificationsDisabled = preferences.persisted?.notificationsEnabled != true || !preferences.notificationsAllowed,
                         notificationRequestError = notificationError,
                     )
+                    Diary -> DiaryScreen(home, onBack = back, onRedFlags = { backStack.add(RedFlags) })
                     Plan -> Column(Modifier.fillMaxSize()) {
                         IconButton(onClick = back, modifier = Modifier.statusBarsPadding()) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.log_back))

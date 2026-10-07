@@ -46,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -81,7 +80,9 @@ fun SessionPlayerScreen(
                 it[2] as Boolean, it[3] as Long)) },
         )
     }
-    var playback by rememberSaveable(stateSaver = playbackSaver) { mutableStateOf(engine.initialState()) }
+    var playback by rememberSaveable(stateSaver = playbackSaver) { mutableStateOf(engine.pause(engine.initialState())) }
+    var preparing by rememberSaveable { mutableStateOf(true) }
+    var otherActions by rememberSaveable { mutableStateOf(false) }
     var abandonDialog by rememberSaveable { mutableStateOf(false) }
     var completionDelivered by rememberSaveable { mutableStateOf(false) }
     var backDelivered by rememberSaveable { mutableStateOf(false) }
@@ -100,6 +101,16 @@ fun SessionPlayerScreen(
         val now = SystemClock.elapsedRealtime()
         val elapsed = if (lastTick[0] == 0L) 0L else (now - lastTick[0]).coerceAtLeast(0)
         playback = engine.pause(playback, elapsed)
+        lastTick[0] = 0L
+    }
+    val updatePlayback: (PlaybackState) -> Unit = { updated ->
+        val previousExercise = engine.stage(playback)?.exerciseIndex
+        val nextExercise = engine.stage(updated)?.exerciseIndex
+        if (nextExercise != null && nextExercise != previousExercise) {
+            preparing = true
+            otherActions = false
+            playback = engine.pause(updated)
+        } else playback = updated
         lastTick[0] = 0L
     }
     val requestBack = {
@@ -139,25 +150,28 @@ fun SessionPlayerScreen(
     }
 
     val currentStage = engine.stage(playback)
-    LaunchedEffect(engine, playback.revision, playback.paused, foreground, abandonDialog, backDelivered) {
-        if (!foreground || playback.paused || abandonDialog || backDelivered || currentStage?.durationMillis == null)
+    val scrollState = rememberScrollState()
+    LaunchedEffect(currentStage?.exerciseIndex, preparing) {
+        if (preparing) scrollState.scrollTo(0)
+    }
+    LaunchedEffect(engine, playback.revision, playback.paused, preparing, foreground, abandonDialog, backDelivered) {
+        if (!foreground || playback.paused || preparing || abandonDialog || backDelivered || currentStage?.durationMillis == null)
             return@LaunchedEffect
         val expectedRevision = playback.revision
         lastTick[0] = SystemClock.elapsedRealtime()
         while (true) {
             delay(100)
             if (!lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) ||
-                playback.paused || playback.revision != expectedRevision || abandonDialog || backDelivered)
+                playback.paused || preparing || playback.revision != expectedRevision || abandonDialog || backDelivered)
                 break
             val now = SystemClock.elapsedRealtime()
             val updated = engine.elapse(playback, (now - lastTick[0]).coerceAtLeast(0), expectedRevision)
             lastTick[0] = now
-            playback = updated
             if (updated.revision != expectedRevision) {
-                lastTick[0] = 0L
+                updatePlayback(updated)
                 signalTimerFinished(context, tone)
                 break
-            }
+            } else playback = updated
         }
     }
     LaunchedEffect(engine.isComplete(playback), foreground, abandonDialog, backDelivered) {
@@ -170,7 +184,7 @@ fun SessionPlayerScreen(
 
     Scaffold { insets ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(insets).verticalScroll(rememberScrollState()).padding(24.dp),
+            modifier = Modifier.fillMaxSize().padding(insets).verticalScroll(scrollState).padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -192,14 +206,20 @@ fun SessionPlayerScreen(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Text(exercise.name, style = MaterialTheme.typography.headlineMedium)
-                Text(exercise.goal, style = MaterialTheme.typography.titleMedium)
-                Text(exercise.cues.take(3).joinToString("\n"), maxLines = 3, overflow = TextOverflow.Ellipsis)
+                if (preparing) {
+                    Text(stringResource(R.string.guided_prepare), style = MaterialTheme.typography.titleMedium)
+                    Text(exercise.goal)
+                    ExerciseInstructions(exercise)
+                }
                 Text(stringResource(R.string.player_set, currentStage.setNumber, prescription.sets),
                     style = MaterialTheme.typography.titleLarge)
                 prescription.reps?.let { Text(stringResource(R.string.player_reps, it)) }
                 prescription.holdSec?.let { Text(stringResource(R.string.player_hold, it)) }
                 prescription.distanceM?.let { Text(stringResource(R.string.player_distance, it)) }
-                Text(stringResource(R.string.player_rest_prescription, prescription.restSec))
+                if (preparing) {
+                    Text(stringResource(R.string.player_rest_prescription, prescription.restSec))
+                    if (exercise.perSide) Text(stringResource(R.string.guided_per_side))
+                }
                 if (currentStage.kind == PlayerStageKind.RECOVERY) {
                     Text(stringResource(R.string.player_recovery), style = MaterialTheme.typography.titleLarge)
                 } else {
@@ -210,38 +230,54 @@ fun SessionPlayerScreen(
                         Text(stringResource(R.string.player_repetition, currentStage.repetition, prescription.reps))
                     }
                 }
-                if (currentStage.durationMillis != null) {
+                if (!preparing && currentStage.durationMillis != null) {
                     Text(stringResource(R.string.player_seconds, (playback.remainingMillis + 999) / 1000),
                         style = MaterialTheme.typography.displayMedium)
                 }
-                if (playback.paused) Text(stringResource(R.string.player_paused))
+                if (playback.paused && !preparing) Text(stringResource(R.string.player_paused))
                 Button(
                     onClick = {
-                        if (playback.paused) {
+                        if (preparing || playback.paused) {
+                            preparing = false
                             lastTick[0] = 0L
                             playback = engine.resume(playback)
-                        } else pausePlayback()
+                        } else if (currentStage.durationMillis == null) updatePlayback(engine.next(playback))
+                        else pausePlayback()
                     },
                     enabled = foreground && !backDelivered && !completionDelivered,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Text(stringResource(if (playback.paused) R.string.player_resume else R.string.player_pause))
+                    Text(stringResource(when {
+                        preparing -> R.string.guided_ready
+                        playback.paused -> R.string.player_resume
+                        currentStage.durationMillis == null -> R.string.guided_set_done
+                        else -> R.string.player_pause
+                    }))
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    IconButton(
-                        onClick = { lastTick[0] = 0L; playback = engine.previous(playback) },
-                        enabled = foreground && playback.stageIndex > 0 && !backDelivered && !completionDelivered,
-                    ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.player_previous)) }
-                    IconButton(
-                        onClick = { lastTick[0] = 0L; playback = engine.next(playback) },
+                if (!preparing) TextButton(onClick = { pausePlayback(); preparing = true },
+                    enabled = foreground && !backDelivered && !completionDelivered) {
+                    Text(stringResource(R.string.guided_instructions))
+                }
+                TextButton(onClick = { otherActions = !otherActions }) {
+                    Text(stringResource(R.string.guided_other_actions))
+                }
+                if (otherActions) {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        IconButton(
+                            onClick = { updatePlayback(engine.previous(playback)) },
+                            enabled = foreground && playback.stageIndex > 0 && !backDelivered && !completionDelivered,
+                        ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.player_previous)) }
+                        IconButton(
+                            onClick = { updatePlayback(engine.next(playback)) },
+                            enabled = foreground && !preparing && !backDelivered && !completionDelivered,
+                        ) { Icon(Icons.AutoMirrored.Filled.ArrowForward, stringResource(R.string.player_next)) }
+                    }
+                    OutlinedButton(
+                        onClick = { updatePlayback(engine.skipExercise(playback)) },
                         enabled = foreground && !backDelivered && !completionDelivered,
-                    ) { Icon(Icons.AutoMirrored.Filled.ArrowForward, stringResource(R.string.player_next)) }
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(stringResource(R.string.player_skip)) }
                 }
-                OutlinedButton(
-                    onClick = { lastTick[0] = 0L; playback = engine.skipExercise(playback) },
-                    enabled = foreground && !backDelivered && !completionDelivered,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(stringResource(R.string.player_skip)) }
             }
         }
     }

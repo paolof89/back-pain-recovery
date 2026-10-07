@@ -16,9 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
@@ -28,6 +26,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -67,6 +72,7 @@ fun HomeScreen(
     onPainCheck: (Long) -> Unit = {},
     notificationsDisabled: Boolean = false,
     notificationRequestError: Boolean = false,
+    onDiary: () -> Unit = {},
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale)
@@ -76,9 +82,9 @@ fun HomeScreen(
     val entry = state.entry
     var requestedWorkOff by rememberSaveable(today) { mutableStateOf(state.workOff) }
     val ready = !state.loading && !state.error && today != null && phase != null && entry != null
-    val history = if (today == null) emptyList() else state.history
-        .filter { it.date >= today.minusDays(13) && it.date <= today }
-        .sortedWith(compareByDescending<SessionLog> { it.date }.thenByDescending { it.id })
+    var otherActions by rememberSaveable(today) { mutableStateOf(false) }
+    val recorded = state.history.filter { it.date == today && it.sessionType == entry?.sessionType }.maxByOrNull { it.id }
+    val pending = state.pendingChecks > 0 && state.pendingSessionId != null
 
     Scaffold { contentPadding ->
         LazyColumn(
@@ -88,23 +94,14 @@ fun HomeScreen(
         ) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    HomeHeading(stringResource(R.string.home_today))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(R.string.home_today), style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.weight(1f).semantics { heading() })
+                        IconButton(onClick = onSettings, enabled = ready) {
+                            Icon(Icons.Default.Settings, stringResource(R.string.s3_settings))
+                        }
+                    }
                     today?.let { Text(it.format(dateFormatter), style = MaterialTheme.typography.bodyLarge) }
-                    OutlinedButton(onClick = onSettings, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                        Text(stringResource(R.string.s3_settings))
-                    }
-                    if (notificationsDisabled) {
-                        HomeMessage(stringResource(R.string.s3_notifications_off), MaterialTheme.colorScheme.error)
-                    }
-                    if (notificationRequestError) {
-                        HomeMessage(stringResource(R.string.s3_request_invalid), MaterialTheme.colorScheme.error)
-                    }
-                    OutlinedButton(onClick = onPlan, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                        Text(stringResource(R.string.weekly_plan_title))
-                    }
-                    TextButton(onClick = onRedFlags, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                        Text(stringResource(R.string.home_red_flags))
-                    }
                 }
             }
             when {
@@ -123,40 +120,16 @@ fun HomeScreen(
                     }
                 }
                 else -> {
-                    if (state.pendingChecks > 0) {
+                    if (pending) {
                         item {
-                            Card(onClick = { state.pendingSessionId?.let(onPainCheck) }, enabled = state.pendingSessionId != null,
-                                modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    HomeHeading(stringResource(R.string.home_pending_title))
-                                    HomeMessage(stringResource(R.string.home_pending_count, state.pendingChecks))
-                                    Text(stringResource(R.string.s3_check_open))
+                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                HomeHeading(stringResource(R.string.home_pending_title))
+                                HomeMessage(stringResource(R.string.home_pending_count, state.pendingChecks))
+                                Button(onClick = { state.pendingSessionId?.let(onPainCheck) },
+                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                    Text(stringResource(R.string.guided_check))
                                 }
                             }
-                        }
-                    }
-                    item {
-                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text(
-                                stringResource(R.string.current_phase, phase!!.id, phase.name),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                            Text(stringResource(R.string.home_phase_week, state.phaseWeek, phase.minWeeks))
-                            HomeHeading(stringResource(R.string.home_weekly_progress))
-                            Text(
-                                stringResource(R.string.home_weekly_count, state.completed, state.target),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            LinearProgressIndicator(
-                                progress = {
-                                    if (state.target > 0) (state.completed.toFloat() / state.target).coerceIn(0f, 1f)
-                                    else 0f
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
                         }
                     }
                     item {
@@ -164,25 +137,67 @@ fun HomeScreen(
                             HomeHeading(stringResource(R.string.home_today_session))
                             Text(stringResource(sessionLabel(entry!!.sessionType)), style = MaterialTheme.typography.titleLarge)
                             Text(stringResource(R.string.reminder_time, entry.reminderTime.format(timeFormatter)))
-                            Button(onClick = onStart, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                Text(stringResource(R.string.home_start))
+                            if (recorded != null) {
+                                HomeMessage(stringResource(R.string.guided_recorded))
+                                Text(stringResource(outcomeLabel(recorded.outcome)))
+                                if (recorded.outcome != SessionOutcome.SKIPPED) {
+                                    Text(stringResource(statusLabel(recorded.status)), color = statusColor(recorded.status))
+                                }
+                                OutlinedButton(onClick = { onLog(recorded.outcome) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                    Text(stringResource(R.string.guided_edit_record))
+                                }
+                            } else {
+                                val strength = entry.sessionType in setOf(SessionType.STRENGTH_A, SessionType.STRENGTH_B)
+                                val startLabel = if (strength) R.string.home_start else R.string.guided_record_activity
+                                if (pending) {
+                                    OutlinedButton(onClick = onStart, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                        Text(stringResource(startLabel))
+                                    }
+                                } else {
+                                    Button(onClick = onStart, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                        Text(stringResource(startLabel))
+                                    }
+                                }
                             }
                             OutlinedButton(onClick = onMinimal, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                                 Text(stringResource(R.string.home_minimal))
                             }
-                            HomeHeading(stringResource(R.string.home_quick_log))
-                            SessionOutcome.entries.forEach { outcome ->
-                                TextButton(
-                                    onClick = { onLog(outcome) },
-                                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                                ) {
-                                    Text(stringResource(outcomeLabel(outcome)))
-                                }
-                            }
+                            Text(stringResource(R.string.home_weekly_count, state.completed, state.target))
+                            LinearProgressIndicator(
+                                progress = { if (state.target > 0) (state.completed.toFloat() / state.target).coerceIn(0f, 1f) else 0f },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                     item {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (notificationsDisabled) HomeMessage(stringResource(R.string.s3_notifications_off))
+                            if (notificationRequestError) HomeMessage(stringResource(R.string.s3_request_invalid), MaterialTheme.colorScheme.error)
+                            TextButton(onClick = onPlan, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.weekly_plan_title))
+                            }
+                            TextButton(onClick = onDiary, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.guided_diary))
+                            }
+                            TextButton(onClick = onRedFlags, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.home_red_flags))
+                            }
+                            TextButton(onClick = { otherActions = !otherActions }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                Text(stringResource(R.string.guided_other_actions))
+                                Icon(if (otherActions) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown, null)
+                            }
+                        }
+                    }
+                    if (otherActions || state.actionError) item {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            HomeHeading(stringResource(R.string.home_quick_log))
+                            SessionOutcome.entries.forEach { outcome ->
+                                TextButton(onClick = { onLog(outcome) }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+                                    Text(stringResource(outcomeLabel(outcome)))
+                                }
+                            }
+                            Text(stringResource(R.string.current_phase, phase!!.id, phase.name))
+                            Text(stringResource(R.string.home_phase_week, state.phaseWeek, phase.minWeeks))
                             HomeHeading(stringResource(R.string.home_office_breaks))
                             Text(stringResource(R.string.home_breaks_count, state.breaksDone, state.breaksTarget))
                             Row(
@@ -207,15 +222,33 @@ fun HomeScreen(
                             }
                         }
                     }
-                    item { HomeHeading(stringResource(R.string.home_history_title)) }
-                    if (history.isEmpty()) {
-                        item { Text(stringResource(R.string.home_history_empty)) }
-                    }
-                    items(history) { log ->
-                        HistoryEntry(log, dateFormatter, onRedFlags)
-                        HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
-                    }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun DiaryScreen(state: HomeUiState, onBack: () -> Unit, onRedFlags: () -> Unit) {
+    val locale = LocalConfiguration.current.locales[0]
+    val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL).withLocale(locale)
+    val history = state.history.filter { log ->
+        state.today?.let { log.date >= it.minusDays(13) && log.date <= it } == true
+    }.sortedWith(compareByDescending<SessionLog> { it.date }.thenByDescending { it.id })
+    Scaffold { insets ->
+        LazyColumn(Modifier.fillMaxSize().padding(insets), contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.log_back)) }
+                    HomeHeading(stringResource(R.string.guided_diary))
+                }
+                Text(stringResource(R.string.home_history_title))
+            }
+            if (history.isEmpty()) item { Text(stringResource(R.string.home_history_empty)) }
+            items(history, key = { it.id }) { log ->
+                HistoryEntry(log, formatter, onRedFlags)
+                HorizontalDivider()
             }
         }
     }

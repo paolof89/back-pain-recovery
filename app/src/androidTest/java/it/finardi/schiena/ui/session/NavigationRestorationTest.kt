@@ -12,6 +12,7 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import it.finardi.schiena.domain.SessionOutcome
 import it.finardi.schiena.ui.Home
+import it.finardi.schiena.ui.Diary
 import it.finardi.schiena.ui.Log
 import it.finardi.schiena.ui.Plan
 import it.finardi.schiena.ui.Player
@@ -28,7 +29,7 @@ class NavigationRestorationTest {
     @Test
     fun actualNavigationKeysRoundTripThroughSavedState() {
         val restoration = StateRestorationTester(compose)
-        val expected = listOf(Home, Plan, Player, Log(SessionOutcome.MINIMAL.name), RedFlags)
+        val expected = listOf(Home, Diary, Plan, Player, Log(SessionOutcome.MINIMAL.name), RedFlags)
         var restoredKeys: List<Any> = emptyList()
         restoration.setContent {
             val stack = rememberNavBackStack(*expected.toTypedArray())

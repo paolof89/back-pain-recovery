@@ -43,10 +43,12 @@ class SessionFlowTest {
     private val phase = Phase(12, "Test database phase", 6)
 
     @Test
-    fun homeQuickDoneSavesInTwoTapsWithRequiredDefaultPain() {
+    fun homeQuickDoneSavesInThreeTapsWithRequiredDefaultPain() {
         val host = render(startInLog = false)
         var taps = 0
 
+        click(R.string.guided_other_actions)
+        taps++
         click(R.string.home_outcome_done)
         taps++
         text(R.string.log_title).assertIsDisplayed()
@@ -65,9 +67,10 @@ class SessionFlowTest {
     }
 
     @Test
-    fun homeQuickMinimalSavesWithoutDurationInTwoTaps() {
+    fun homeQuickMinimalSavesWithoutDurationInThreeTaps() {
         val host = render(type = SessionType.AEROBIC, startInLog = false)
 
+        click(R.string.guided_other_actions)
         click(R.string.home_outcome_minimal)
         text(R.string.log_minimal).assertIsSelected()
         field(R.string.log_duration).assertDoesNotExist()
@@ -79,9 +82,10 @@ class SessionFlowTest {
     }
 
     @Test
-    fun homeQuickSkippedSavesInTwoTapsWithoutPainOrDuration() {
+    fun homeQuickSkippedSavesInThreeTapsWithoutPainOrDuration() {
         val host = render(type = SessionType.PILATES, startInLog = false)
 
+        click(R.string.guided_other_actions)
         click(R.string.home_outcome_skipped)
         text(R.string.log_skipped).assertIsSelected()
         slider().assertDoesNotExist()

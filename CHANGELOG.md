@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Guided UX Recovery - 2026-10-07
+
+- Separate first launch from the full settings form: explicit consent, direct access to Today and optional reminder permissions, preserving seeded defaults and existing preferences.
+- Put today's session and pending pain check before statistics. Offer editing for today's recorded planned session and honest recording labels for activities without a player.
+- Move recent history to Diary and collapse quick logs, phase details and office controls under Other actions. Preserve minimal-session, work-off, safety and settings access.
+- Add paused preparation before the first and each new exercise, complete cue text, explicit readiness, instruction reopening without timer reset and a manual-stage completion command.
+- Support verified offline image/step catalogs by exercise ID with source, license, reviewer, accessible descriptions and constrained asset paths. Catalog remains empty until authorized reviewed materials are supplied; visual demonstrations are not complete.
+- Add catalog unit tests and Compose coverage for preparation, exercise transitions, reopening instructions, restoration, single completion, home states and Diary. Adapt onboarding, quick-log and navigation-restoration tests.
+- Static XML/resource, test-declaration, catalog and timer-guard checks passed; editor diagnostics reported no errors. No Kotlin compilation, Android lint or test execution is claimed: build remains GitHub Actions only and device verification is outstanding.
+- Preserve Room schema, program seed, notification scheduling, safety rules, signing and versionCode handling. No commit or push performed.
+
 ### Sprint 3 - 2026-10-06
 
 - Add explicit disclaimer onboarding, database-backed weekly schedule editing, work window/days, check time and notification preferences.
